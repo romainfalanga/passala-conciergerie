@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — La Clef Provençale</title>
+<meta name="description" content="Contactez La Clef Provençale pour une étude gratuite et personnalisée de la gestion de votre maison ou villa en Provence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header id="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">C</span>
+      <span>La Clef Provençale<small>Conciergerie & gestion locative</small></span>
+    </a>
+    <nav id="main-nav">
+      <a href="index.html">Accueil</a>
+      <a href="nos-biens.html">Nos biens</a>
+      <a href="partenaires.html">Partenaires</a>
+      <a href="a-propos.html">À propos</a>
+      <div class="nav-cta">
+        <a href="contact.html" class="btn btn-primary">Demander mon étude gratuite</a>
+      </div>
+    </nav>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Ouvrir le menu"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</header>
+
+<main>
+  <section class="page-hero" style="padding:150px 0 70px;">
+    <div class="hero-bg" style="background-image:url('images/villa-piscine-terrasse.jpg');"></div>
+    <div class="container page-hero-content">
+      <span class="eyebrow">Parlons de votre bien</span>
+      <h1>Demandez votre étude gratuite</h1>
+      <p>Renseignez le formulaire ci-dessous : nous revenons vers vous sous 24h pour échanger sur votre maison ou votre villa, sans aucun engagement.</p>
+    </div>
+  </section>
+
+  <section id="contact-section">
+    <div class="container">
+      <div class="contact-layout">
+
+        <div class="contact-info-card">
+          <span class="eyebrow">Nos coordonnées</span>
+          <h3>Échangeons directement</h3>
+          <p>Notre équipe est disponible pour répondre à toutes vos questions sur le fonctionnement de notre conciergerie.</p>
+
+          <div class="contact-info-item">
+            <div class="icon"><i class="fa-solid fa-phone"></i></div>
+            <div><strong>Téléphone</strong><a href="tel:+33744896602">07 44 89 66 02</a></div>
+          </div>
+          <div class="contact-info-item">
+            <div class="icon"><i class="fa-solid fa-envelope"></i></div>
+            <div><strong>Email</strong><a href="mailto:contact@laclefprovencale.fr">contact@laclefprovencale.fr</a></div>
+          </div>
+          <div class="contact-info-item">
+            <div class="icon"><i class="fa-solid fa-location-dot"></i></div>
+            <div><strong>Secteur d'intervention</strong><span>Luberon, Aix-en-Provence, Alpilles, Cassis &amp; littoral</span></div>
+          </div>
+          <div class="contact-info-item">
+            <div class="icon"><i class="fa-solid fa-clock"></i></div>
+            <div><strong>Disponibilité</strong><span>Du lundi au samedi, 9h – 19h · Urgences 24/7 pour nos propriétaires</span></div>
+          </div>
+
+          <p style="margin-top:30px;font-size:0.85rem;">En soumettant ce formulaire, votre demande est directement transmise à notre équipe. Vous pouvez aussi nous écrire à tout moment à <a href="mailto:contact@laclefprovencale.fr" style="text-decoration:underline;">contact@laclefprovencale.fr</a>.</p>
+        </div>
+
+        <div class="form-card">
+          <span class="eyebrow">Formulaire de contact</span>
+          <h3>Parlez-nous de votre bien</h3>
+          <form id="contact-form" novalidate>
+            <div class="form-row">
+              <div class="field">
+                <label for="full_name">Nom &amp; prénom <span class="req">*</span></label>
+                <input type="text" id="full_name" name="full_name" required placeholder="Jean Dupont">
+              </div>
+              <div class="field">
+                <label for="phone">Téléphone <span class="req">*</span></label>
+                <input type="tel" id="phone" name="phone" required placeholder="06 12 34 56 78">
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="email">Adresse email <span class="req">*</span></label>
+              <input type="email" id="email" name="email" required placeholder="vous@exemple.fr">
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label for="property_type">Type de bien <span class="req">*</span></label>
+                <select id="property_type" name="property_type" required>
+                  <option value="" disabled selected>Sélectionnez…</option>
+                  <option value="Villa">Villa</option>
+                  <option value="Maison">Maison</option>
+                  <option value="Mas / Bastide">Mas / Bastide</option>
+                  <option value="Appartement">Appartement</option>
+                  <option value="Autre">Autre</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="city">Ville / secteur du bien <span class="req">*</span></label>
+                <input type="text" id="city" name="city" required placeholder="Ex : Gordes, Aix-en-Provence…">
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="already_rented">Votre bien est-il déjà loué en saisonnier ?</label>
+              <select id="already_rented" name="already_rented">
+                <option value="Je ne sais pas" selected>Je ne sais pas encore</option>
+                <option value="Oui">Oui, déjà en location saisonnière</option>
+                <option value="Non">Non, pas encore</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="message">Votre message</label>
+              <textarea id="message" name="message" placeholder="Parlez-nous de votre bien, de vos besoins ou de vos questions…"></textarea>
+            </div>
+
+            <div class="checkbox-field">
+              <input type="checkbox" id="consent" name="consent" required>
+              <label for="consent">J'accepte que mes informations soient utilisées par La Clef Provençale afin de me recontacter au sujet de ma demande, conformément à sa politique de confidentialité. <span class="req">*</span></label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" id="submit-btn">
+              <i class="fa-solid fa-paper-plane"></i> Envoyer ma demande
+            </button>
+
+            <div id="form-feedback"></div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="index.html" class="brand"><span class="brand-mark">C</span><span>La Clef Provençale</span></a>
+        <p>Conciergerie privée dédiée aux propriétaires de maisons et villas en Provence : gestion locative, entretien et tranquillité d'esprit.</p>
+      </div>
+      <div>
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="nos-biens.html">Nos biens</a></li>
+          <li><a href="partenaires.html">Partenaires</a></li>
+          <li><a href="a-propos.html">À propos</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Secteurs</h4>
+        <ul>
+          <li><a href="nos-biens.html">Luberon</a></li>
+          <li><a href="nos-biens.html">Aix-en-Provence</a></li>
+          <li><a href="nos-biens.html">Cassis &amp; littoral</a></li>
+          <li><a href="nos-biens.html">Alpilles</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li><i class="fa-solid fa-phone"></i> 07 44 89 66 02</li>
+          <li><i class="fa-solid fa-envelope"></i> contact@laclefprovencale.fr</li>
+          <li><i class="fa-solid fa-location-dot"></i> Gordes, Vaucluse</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 La Clef Provençale — Tous droits réservés</span>
+      <span>Conciergerie de maisons &amp; villas en Provence</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script src="js/contact-form.js"></script>
+</body>
+</html>
