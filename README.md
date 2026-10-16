@@ -28,7 +28,7 @@ Dans GitHub → Settings → Secrets and variables → Actions → Repository se
 `EMAIL_FROM` et `NOTIFY_EMAIL` peuvent également être des variables Actions. Les deux secrets Cloudflare ne sont disponibles que dans GitHub Actions : ils ne sont jamais copiés dans le site ou les réponses API.
 
 1. Le workflow **Cloudflare reservations** installe les dépendances figées, génère les types, vérifie le code, exécute les tests, crée la base D1 en juridiction UE si elle n'existe pas, applique les migrations et déploie `passala-reservations`.
-2. Le résumé Actions fournit l'URL publique du Worker. Dans Netlify, définir `PASSALA_API_ORIGIN` (scope Builds) sur cette URL, sans chemin. Publier le site : `npm run build` produit uniquement les fichiers publics dans `dist/`, ainsi qu'un proxy `/api/*` vers le Worker. Le nom de domaine du site reste chez Netlify.
+2. Le résumé Actions fournit l'URL publique du Worker. `PASSALA_API_ORIGIN` est définie dans `[build.environment]` de `netlify.toml` avec l'URL du Worker déployé. Cette URL est publique et ne contient aucun secret ; si le Worker change, mettre à jour cette valeur. Publier le site : `npm run build` produit uniquement les fichiers publics dans `dist/`, ainsi qu'un proxy `/api/*` vers le Worker. Le nom de domaine du site reste chez Netlify.
 3. Ouvrir `/admin-espace.html` et se connecter avec `ADMIN_PASSWORD`.
 4. Compléter la fiche **Le Cosi** et saisir tous les séjours existants dans **Disponibilités**. Cocher la vérification des dates puis enregistrer pour ouvrir le calendrier public.
 5. Après ajout ou modification d'un secret GitHub, relancer le workflow depuis Actions → Cloudflare reservations → Run workflow. Les secrets Worker déjà existants sont conservés lorsqu'ils ne sont pas fournis.

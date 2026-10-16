@@ -3,6 +3,7 @@
   publish = "dist"
 [build.environment]
   NODE_VERSION = "24"
+  PASSALA_API_ORIGIN = "https://passala-reservations.passalaconciergerie.workers.dev"
 [[headers]]
   for = "/*"
   [headers.values]

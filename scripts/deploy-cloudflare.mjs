@@ -81,7 +81,7 @@ try {
     await new Promise(resolve => setTimeout(resolve, 5000));
   }
   if (!healthy) throw new Error('API déployée, mais le contrôle de santé a échoué. Vérifiez la disponibilité du sous-domaine workers.dev.');
-  const summary = `## Passala — Cloudflare\n\nAPI : ${origin}\n\nBase D1 : ${name}\n\nAdministration : ${names.has('ADMIN_PASSWORD') ? 'configurée' : 'ajouter le secret ADMIN_PASSWORD (16 caractères minimum), puis relancer le workflow'}\n\nEmails : ${['RESEND_API_KEY','EMAIL_FROM','NOTIFY_EMAIL'].every(k => names.has(k)) ? 'configurés' : 'ajouter RESEND_API_KEY, EMAIL_FROM et NOTIFY_EMAIL pour activer les notifications'}\n\nNetlify : définir PASSALA_API_ORIGIN sur l’URL de l’API ci-dessus, puis publier le site.\n\nLe calendrier initial reste fermé jusqu’à la vérification des réservations existantes dans l’administration.\n`;
+  const summary = `## Passala — Cloudflare\n\nAPI : ${origin}\n\nBase D1 : ${name}\n\nAdministration : ${names.has('ADMIN_PASSWORD') ? 'configurée' : 'ajouter le secret ADMIN_PASSWORD (16 caractères minimum), puis relancer le workflow'}\n\nEmails : ${['RESEND_API_KEY','EMAIL_FROM','NOTIFY_EMAIL'].every(k => names.has(k)) ? 'configurés' : 'ajouter RESEND_API_KEY, EMAIL_FROM et NOTIFY_EMAIL pour activer les notifications'}\n\nNetlify : vérifier que PASSALA_API_ORIGIN dans netlify.toml correspond à l’URL de l’API ci-dessus, puis publier le site.\n\nLe calendrier initial reste fermé jusqu’à la vérification des réservations existantes dans l’administration.\n`;
   if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, summary);
   console.log('Déploiement Cloudflare et vérification terminés.');
 } finally { await rm(configPath, { force: true }); }
