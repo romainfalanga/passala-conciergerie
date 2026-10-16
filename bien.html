@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiche bien — Passala Conciergerie</title>
+<meta name="description" content="Découvrez en détail ce bien géré par Passala Conciergerie : équipements, capacité et prestations de conciergerie.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header id="site-header">
+  <div class="logo-banner">
+    <img src="images/icon-olive-branch-v6.png" alt="" class="banner-icon">
+    <span class="banner-text">Passala Conciergerie</span>
+    <img src="images/icon-lavender-branch-v6.png" alt="" class="banner-icon">
+    <button class="nav-toggle" id="nav-toggle" aria-label="Ouvrir le menu"><i class="fa-solid fa-bars"></i></button>
+  </div>
+  <div class="header-inner">
+    <nav id="main-nav">
+      <a href="index.html">Accueil</a>
+      <a href="nos-biens.html" class="active">Nos biens</a>
+      <div class="nav-dropdown">
+        <button type="button" class="dropdown-trigger">Nettoyage <i class="fa-solid fa-chevron-down"></i></button>
+        <div class="dropdown-menu">
+          <a href="nettoyage.html#service">Service</a>
+          <a href="nettoyage.html#tarif">Tarif</a>
+          <a href="nettoyage.html#devis">Devis</a>
+        </div>
+      </div>
+      <a href="partenaires.html">Partenaires</a>
+      <a href="a-propos.html">À propos</a>
+      <div class="nav-cta">
+        <a href="contact.html" class="btn btn-primary">Demander mon étude gratuite</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main id="property-detail">
+  <div class="container text-center" style="padding:160px 0;">
+    <p>Chargement du bien…</p>
+  </div>
+</main>
+
+<footer id="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <p class="footer-brand-name">Passala Conciergerie</p>
+        <p>Conciergerie privée dédiée aux propriétaires de biens : gestion locative, entretien et tranquillité d'esprit.</p>
+      </div>
+      <div>
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="nos-biens.html">Nos biens</a></li>
+          <li><a href="nettoyage.html">Nettoyage</a></li>
+          <li><a href="partenaires.html">Partenaires</a></li>
+          <li><a href="a-propos.html">À propos</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Secteurs</h4>
+        <ul>
+          <li><a href="nos-biens.html">De Six-Fours-les-Plages à Saint-Cyr-sur-Mer</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>
+          <li><i class="fa-solid fa-phone"></i> 07 44 89 66 02</li>
+          <li><i class="fa-solid fa-envelope"></i> contact@passala-conciergerie.fr</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Passala Conciergerie — Tous droits réservés</span>
+      <span>Conciergerie de maisons, villas &amp; appartements en Provence</span>
+    </div>
+  </div>
+</footer>
+
+
+<script src="js/main.js"></script>
+<script src="js/availability-calendar.js"></script>
+<script src="js/properties.js"></script>
+<script>renderPropertyDetail();</script>
+</body>
+</html>
