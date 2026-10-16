@@ -1,270 +1,39 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Espace propriétaire — Passala Conciergerie</title>
-<meta name="robots" content="noindex, nofollow">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
-<link rel="stylesheet" href="css/style.css">
-<style>
-  #admin-page { padding: 60px 0 100px; }
-  #admin-page .container { max-width: 760px; }
-  .admin-intro { background: var(--color-white); border-radius: var(--radius-lg); padding: 26px 30px; box-shadow: var(--shadow-card); margin-bottom: 30px; }
-  .admin-intro p { margin-bottom: 8px; font-size: 0.94rem; }
-  .admin-select { margin-bottom: 30px; }
-  .admin-select select {
-    width: 100%; padding: 13px 16px; border-radius: var(--radius-md);
-    border: 1.5px solid rgba(20,37,52,0.16); font-family: var(--font-sans);
-    font-size: 0.98rem; background: var(--color-cream); color: var(--color-ink);
-  }
-  .admin-note { font-size: 0.85rem; color: var(--color-ink-soft); text-align: center; margin-top: 18px; }
-  #admin-feedback, #ratings-feedback { margin-top: 16px; padding: 12px 16px; border-radius: var(--radius-md); font-size: 0.9rem; display: none; }
-  #admin-feedback.success, #ratings-feedback.success { display: block; background: #e0f2e8; color: #1b6b45; }
-  #admin-feedback.error, #ratings-feedback.error { display: block; background: #f8e3dd; color: #963f27; }
-  #admin-feedback.info, #ratings-feedback.info { display: block; background: rgba(201,169,98,0.15); color: var(--color-gold-dark); }
-  .ratings-form-card { background: var(--color-white); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-card); }
-  .ratings-block { border-top: 1px solid rgba(20,37,52,0.08); padding-top: 20px; margin-top: 20px; }
-  .ratings-block:first-child { border-top: none; padding-top: 0; margin-top: 0; }
-  .ratings-block h3 { font-size: 1.05rem; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-  .ratings-block h3 i { color: var(--color-gold-dark); }
-  .admin-section-title { font-size: 1.3rem; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
-  .admin-section-title i { color: var(--color-gold-dark); }
-  .admin-block { margin-bottom: 50px; }
-  .admin-block:last-child { margin-bottom: 0; }
-</style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Réservations — Passala Conciergerie</title><meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
-
-<header id="site-header">
-  <div class="logo-banner">
-    <img src="images/icon-olive-branch-v6.png" alt="" class="banner-icon">
-    <span class="banner-text">Passala Conciergerie</span>
-    <img src="images/icon-lavender-branch-v6.png" alt="" class="banner-icon">
-  </div>
-</header>
-
-<main id="admin-page">
-  <div class="container">
-    <div class="admin-intro">
-      <span class="eyebrow">Espace propriétaire</span>
-      <h1 style="font-size:1.8rem;">Gestion de vos biens</h1>
-      <p>Choisissez un bien ci-dessous : vous pourrez ensuite gérer son calendrier de disponibilité et ses notes Airbnb / Booking depuis cette même page.</p>
-      <p style="color:var(--color-terracotta-dark);font-weight:600;">⚠️ Cette page n'est pas listée dans le menu du site — ne partagez son lien qu'en interne.</p>
-    </div>
-
-    <div class="admin-select">
-      <label for="admin-property-select" style="display:block;font-weight:600;margin-bottom:8px;">Bien à gérer</label>
-      <select id="admin-property-select"></select>
-    </div>
-
-    <!-- DISPONIBILITÉS -->
-    <section class="admin-block">
-      <h2 class="admin-section-title"><i class="fa-solid fa-calendar-days"></i> Calendrier de disponibilité</h2>
-      <p style="margin-bottom:18px;font-size:0.94rem;">Cliquez sur une date <strong style="color:#1b6b45;">verte</strong> pour la rendre <strong>indisponible</strong> (elle passera en rouge), ou sur une date <strong style="color:#963f27;">rouge</strong> pour la <strong>libérer</strong> à nouveau. Les changements sont enregistrés instantanément.</p>
-      <div id="admin-calendar"></div>
-      <div id="admin-feedback"></div>
-      <p class="admin-note">Astuce : vous pouvez aussi bloquer une période entière en cliquant jour par jour.</p>
-    </section>
-
-    <!-- NOTES AIRBNB / BOOKING -->
-    <section class="admin-block">
-      <h2 class="admin-section-title"><i class="fa-solid fa-star"></i> Notes Airbnb &amp; Booking</h2>
-      <p style="margin-bottom:18px;font-size:0.94rem;">Mettez ici à jour manuellement la note et le nombre d'avis, tels qu'affichés sur Airbnb et Booking.com. Ces informations s'affichent ensuite automatiquement sur la fiche du bien.</p>
-      <div class="ratings-form-card">
-        <form id="ratings-form">
-          <div class="ratings-block">
-            <h3><i class="fa-brands fa-airbnb"></i> Airbnb</h3>
-            <div class="form-row">
-              <div class="field">
-                <label for="rating_airbnb">Note (sur 5)</label>
-                <input type="number" id="rating_airbnb" name="rating_airbnb" min="0" max="5" step="0.01" placeholder="Ex : 4.9">
-              </div>
-              <div class="field">
-                <label for="rating_airbnb_count">Nombre d'avis</label>
-                <input type="number" id="rating_airbnb_count" name="rating_airbnb_count" min="0" step="1" placeholder="Ex : 32">
-              </div>
-            </div>
-          </div>
-
-          <div class="ratings-block">
-            <h3><i class="fa-solid fa-star"></i> Booking.com</h3>
-            <div class="form-row">
-              <div class="field">
-                <label for="rating_booking">Note (sur 10)</label>
-                <input type="number" id="rating_booking" name="rating_booking" min="0" max="10" step="0.1" placeholder="Ex : 9.2">
-              </div>
-              <div class="field">
-                <label for="rating_booking_count">Nombre d'avis</label>
-                <input type="number" id="rating_booking_count" name="rating_booking_count" min="0" step="1" placeholder="Ex : 18">
-              </div>
-            </div>
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-block" id="ratings-submit-btn" style="margin-top:10px;">
-            <i class="fa-solid fa-floppy-disk"></i> Enregistrer les notes
-          </button>
-          <div id="ratings-feedback"></div>
-        </form>
-      </div>
-      <p class="admin-note">Astuce : laissez un champ vide si la note n'existe pas encore ou ne doit pas s'afficher sur le site.</p>
-    </section>
-  </div>
+<header class="admin-header"><a href="index.html">Passala <span>Conciergerie</span></a><span>Espace de gestion</span><button id="logout" class="btn btn-outline" hidden>Se déconnecter</button></header>
+<main class="admin-main">
+<section id="login-panel" class="admin-card login-card">
+<span class="eyebrow">Espace privé</span><h1>Gérer vos réservations</h1><p>Connectez-vous pour consulter les demandes et organiser les disponibilités de vos logements.</p>
+<form id="login-form"><div class="field"><label for="password">Mot de passe</label><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256"></div><button class="btn btn-primary btn-block">Se connecter</button></form>
+</section>
+<div id="feedback" role="status" aria-live="polite"></div>
+<div id="dashboard" hidden>
+<div class="admin-heading"><div><span class="eyebrow">Votre activité</span><h1>Demandes &amp; calendrier</h1></div><button id="refresh" class="btn btn-outline">Actualiser</button></div>
+<p id="email-status" class="admin-notice"></p>
+<div class="field"><label for="property-select">Logement</label><select id="property-select"></select></div>
+<nav class="admin-tabs" aria-label="Rubriques"><button class="active" data-tab="bookings">Réservations</button><button data-tab="calendar">Disponibilités</button><button data-tab="property">Fiche du logement</button><button data-tab="leads">Contacts</button></nav>
+<section data-panel="bookings"><div class="section-top"><h2>Demandes de séjour</h2><p>Une demande reste disponible à la réservation jusqu’à sa confirmation.</p></div><div id="booking-list"></div><button id="more-bookings" class="btn btn-outline" hidden>Voir les demandes suivantes</button></section>
+<section data-panel="calendar" hidden>
+<div class="admin-card"><h2>Calendrier public</h2><p id="calendar-status"></p><label class="checkbox-field"><input type="checkbox" id="calendar-ready"> J’ai vérifié les réservations existantes et saisi toutes les périodes indisponibles. Activer les demandes sur le site.</label><button id="save-calendar-ready" class="btn btn-primary">Enregistrer l’ouverture du calendrier</button></div>
+<div class="admin-card"><h2>Disponibilités</h2><p>Les jours rouges correspondent à des nuits occupées. Cliquez sur une nuit libre pour la bloquer, ou sur un blocage manuel pour le retirer. Pour libérer un séjour confirmé, annulez sa réservation.</p><div id="admin-calendar"></div></div>
+<div class="admin-card"><h2>Bloquer une période</h2><p>Utilisez ce formulaire pour vos séjours personnels, les réservations reçues ailleurs ou les travaux. Les plateformes externes ne sont pas synchronisées automatiquement.</p><form id="block-form"><div class="form-row"><div class="field"><label for="block-start">Première nuit</label><input id="block-start" name="checkin" type="date" required></div><div class="field"><label for="block-end">Départ (jour libéré)</label><input id="block-end" name="checkout" type="date" required></div></div><div class="field"><label for="block-note">Note interne</label><input id="block-note" name="note" maxlength="250" placeholder="Ex. réservation Airbnb"></div><button class="btn btn-primary">Bloquer la période</button></form></div>
+</section>
+<section data-panel="property" hidden><div class="admin-card"><h2>Informations du logement</h2><p>Seules les informations connues sont renseignées. Les champs laissés vides ne sont pas affichés.</p><form id="property-form">
+<div class="form-row"><div class="field"><label for="property-name">Nom</label><input id="property-name" name="name" required maxlength="120"></div><div class="field"><label for="property-capacity">Voyageurs maximum</label><input id="property-capacity" name="capacity" type="number" min="1" max="30" required></div></div>
+<div class="field"><label for="property-location">Localisation</label><input id="property-location" name="location" required maxlength="250"></div><div class="field"><label for="property-description">Description</label><textarea id="property-description" name="description" required maxlength="5000" rows="6"></textarea></div>
+<div class="form-row"><div class="field"><label for="property-bedrooms">Chambres</label><input id="property-bedrooms" name="bedrooms" type="number" min="0" max="30"></div><div class="field"><label for="property-bathrooms">Salles de bain</label><input id="property-bathrooms" name="bathrooms" type="number" min="0" max="30"></div><div class="field"><label for="property-surface">Surface (m²)</label><input id="property-surface" name="surface" type="number" min="0" max="10000" step="0.1"></div></div>
+<label class="checkbox-field"><input name="accepts_pets" type="checkbox"> Animaux acceptés</label>
+<h3>Notes des plateformes</h3><p>À recopier depuis les annonces. Laissez vide pour masquer une note.</p><div class="form-row"><div class="field"><label for="rating-airbnb">Airbnb / 5</label><input id="rating-airbnb" name="rating_airbnb" type="number" min="0" max="5" step="0.01"></div><div class="field"><label for="count-airbnb">Nombre d’avis Airbnb</label><input id="count-airbnb" name="rating_airbnb_count" type="number" min="0" max="1000000"></div></div><div class="form-row"><div class="field"><label for="rating-booking">Booking / 10</label><input id="rating-booking" name="rating_booking" type="number" min="0" max="10" step="0.01"></div><div class="field"><label for="count-booking">Nombre d’avis Booking</label><input id="count-booking" name="rating_booking_count" type="number" min="0" max="1000000"></div></div><button class="btn btn-primary">Enregistrer la fiche</button>
+</form></div></section>
+<section data-panel="leads" hidden><div class="section-top"><h2>Demandes de contact</h2><p>Les messages envoyés depuis le formulaire du site.</p></div><div id="lead-list"></div><button id="more-leads" class="btn btn-outline" hidden>Voir les contacts suivants</button></section>
+</div>
 </main>
-
-<footer id="site-footer">
-  <div class="container">
-    <div class="footer-bottom" style="border-top:none;padding-top:0;">
-      <span>© 2026 Passala Conciergerie — Espace de gestion interne</span>
-    </div>
-  </div>
-</footer>
-
-<script src="js/availability-calendar.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', async function () {
-  const select = document.getElementById('admin-property-select');
-  const calContainer = document.getElementById('admin-calendar');
-  const calFeedback = document.getElementById('admin-feedback');
-  const ratingsForm = document.getElementById('ratings-form');
-  const ratingsFeedback = document.getElementById('ratings-feedback');
-  const ratingsSubmitBtn = document.getElementById('ratings-submit-btn');
-  let properties = [];
-
-  function showCalFeedback(type, text) {
-    calFeedback.className = type;
-    calFeedback.innerHTML = text;
-  }
-
-  function showRatingsFeedback(type, text) {
-    ratingsFeedback.className = type;
-    ratingsFeedback.innerHTML = text;
-  }
-
-  async function loadProperties() {
-    const res = await fetch('tables/properties?limit=100');
-    const json = await res.json();
-    properties = (json.data || []).filter(function (p) { return !p.deleted; });
-    if (!properties.length) {
-      select.innerHTML = '<option>Aucun bien disponible</option>';
-      return;
-    }
-    select.innerHTML = properties.map(function (p) {
-      return '<option value="' + p.id + '">' + p.name + ' — ' + p.location + '</option>';
-    }).join('');
-  }
-
-  function currentProperty() {
-    var id = select.value;
-    for (var i = 0; i < properties.length; i++) {
-      if (properties[i].id === id) return properties[i];
-    }
-    return null;
-  }
-
-  function fillRatingsForm(p) {
-    ratingsForm.rating_airbnb.value = (p.rating_airbnb !== undefined && p.rating_airbnb !== null) ? p.rating_airbnb : '';
-    ratingsForm.rating_airbnb_count.value = (p.rating_airbnb_count !== undefined && p.rating_airbnb_count !== null) ? p.rating_airbnb_count : '';
-    ratingsForm.rating_booking.value = (p.rating_booking !== undefined && p.rating_booking !== null) ? p.rating_booking : '';
-    ratingsForm.rating_booking_count.value = (p.rating_booking_count !== undefined && p.rating_booking_count !== null) ? p.rating_booking_count : '';
-  }
-
-  async function loadCalendarFor(propertyId) {
-    const unavailable = await fetchUnavailableDates(propertyId);
-    createAvailabilityCalendar(calContainer, {
-      propertyId: propertyId,
-      selectable: false,
-      monthsToShow: 2,
-      unavailable: unavailable,
-      onDayClick: async function (dateKeyStr, isCurrentlyUnavailable) {
-        await toggleDate(propertyId, dateKeyStr, isCurrentlyUnavailable);
-      }
-    });
-    calContainer.classList.add('cal-admin-wrapper');
-    const widget = calContainer.querySelector('.cal-widget');
-    if (widget) widget.classList.add('cal-admin');
-  }
-
-  async function toggleDate(propertyId, dateKeyStr, isCurrentlyUnavailable) {
-    showCalFeedback('info', 'Mise à jour en cours…');
-    try {
-      if (isCurrentlyUnavailable) {
-        const res = await fetch('tables/availability?limit=1000');
-        const json = await res.json();
-        const row = (json.data || []).find(function (r) { return !r.deleted && r.property_id === propertyId && r.date === dateKeyStr && r.status === 'Indisponible'; });
-        if (row) {
-          await fetch('tables/availability/' + encodeURIComponent(row.id), { method: 'DELETE' });
-        }
-        showCalFeedback('success', 'Le ' + dateKeyStr.split('-').reverse().join('/') + ' est de nouveau disponible.');
-      } else {
-        await fetch('tables/availability', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ property_id: propertyId, date: dateKeyStr, status: 'Indisponible' })
-        });
-        showCalFeedback('success', 'Le ' + dateKeyStr.split('-').reverse().join('/') + ' est maintenant marqué indisponible.');
-      }
-      await loadCalendarFor(propertyId);
-    } catch (e) {
-      console.error(e);
-      showCalFeedback('error', 'Une erreur est survenue. Merci de réessayer.');
-    }
-  }
-
-  async function selectProperty(propertyId) {
-    const p = currentProperty();
-    calFeedback.className = '';
-    calFeedback.innerHTML = '';
-    ratingsFeedback.className = '';
-    ratingsFeedback.innerHTML = '';
-    await loadCalendarFor(propertyId);
-    if (p) fillRatingsForm(p);
-  }
-
-  await loadProperties();
-  if (properties.length) {
-    await selectProperty(properties[0].id);
-    select.addEventListener('change', function () {
-      selectProperty(select.value);
-    });
-  }
-
-  ratingsForm.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    var p = currentProperty();
-    if (!p) return;
-
-    var data = {
-      rating_airbnb: ratingsForm.rating_airbnb.value === '' ? null : parseFloat(ratingsForm.rating_airbnb.value),
-      rating_airbnb_count: ratingsForm.rating_airbnb_count.value === '' ? null : parseInt(ratingsForm.rating_airbnb_count.value, 10),
-      rating_booking: ratingsForm.rating_booking.value === '' ? null : parseFloat(ratingsForm.rating_booking.value),
-      rating_booking_count: ratingsForm.rating_booking_count.value === '' ? null : parseInt(ratingsForm.rating_booking_count.value, 10)
-    };
-
-    ratingsSubmitBtn.disabled = true;
-    ratingsSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enregistrement…';
-    showRatingsFeedback('info', 'Enregistrement en cours…');
-
-    try {
-      var res = await fetch('tables/properties/' + encodeURIComponent(p.id), {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      if (!res.ok) throw new Error('Erreur serveur');
-      Object.assign(p, data);
-      showRatingsFeedback('success', 'Les notes de « ' + p.name + ' » ont bien été mises à jour.');
-    } catch (err) {
-      console.error(err);
-      showRatingsFeedback('error', 'Une erreur est survenue. Merci de réessayer.');
-    } finally {
-      ratingsSubmitBtn.disabled = false;
-      ratingsSubmitBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Enregistrer les notes';
-    }
-  });
-});
-</script>
-</body>
-</html>
+<script src="js/api.js"></script><script src="js/availability-calendar.js"></script><script src="js/admin.js"></script>
+</body></html>

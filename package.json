@@ -1,0 +1,22 @@
+{
+  "name": "passala-conciergerie",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-site.mjs",
+    "test": "node --test backend/test/*.test.mjs",
+    "check": "tsc --noEmit",
+    "types": "wrangler types backend/worker-configuration.d.ts --config backend/wrangler.jsonc",
+    "dev:api": "wrangler dev --config backend/wrangler.jsonc",
+    "deploy:api": "node scripts/deploy-cloudflare.mjs"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261016.1",
+    "@types/node": "^24.19.2",
+    "esbuild": "0.25.12",
+    "miniflare": "4.20260730.0",
+    "typescript": "5.9.3",
+    "wrangler": "4.151.1"
+  }
+}

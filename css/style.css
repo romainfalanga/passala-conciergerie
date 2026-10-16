@@ -1206,3 +1206,11 @@ section { padding: 90px 0; }
 /* Utility */
 .text-center { text-align: center; }
 .mt-0 { margin-top: 0; }
+
+/* Booking forms and server-backed calendar */
+.booking-modal-overlay{z-index:2000}
+.form-honeypot{position:absolute!important;width:1px;height:1px;overflow:hidden;left:-10000px}
+.cal-day:disabled{cursor:not-allowed}
+.cal-day.cal-departure{cursor:pointer;box-shadow:inset 0 0 0 2px #a3803f}
+.cal-day:focus-visible,.cal-nav-btn:focus-visible{outline:3px solid #a3803f;outline-offset:2px}
+.booking-modal [id$="feedback"]{overflow-wrap:anywhere}

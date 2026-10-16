@@ -1,0 +1,10 @@
+import { cp, mkdir, readdir, rm, writeFile } from 'node:fs/promises';
+const value = process.env.PASSALA_API_ORIGIN;
+if (!value) throw new Error('PASSALA_API_ORIGIN doit être défini dans les variables Netlify (URL publique du Worker).');
+const origin = new URL(value);
+if (origin.protocol !== 'https:' || origin.username || origin.password || origin.pathname !== '/' || origin.search || origin.hash) throw new Error('PASSALA_API_ORIGIN doit être une origine HTTPS sans chemin.');
+await rm('dist', { recursive: true, force: true }); await mkdir('dist');
+for (const file of await readdir('.')) if (file.endsWith('.html')) await cp(file, 'dist/' + file);
+for (const dir of ['css', 'js', 'images']) await cp(dir, 'dist/' + dir, { recursive: true });
+await writeFile('dist/_redirects', `/api/* ${origin.origin}/api/:splat 200!\n`);
+console.log('Site construit. Seuls les fichiers publics sont publiés.');

@@ -1,0 +1,19 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "passala-reservations",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-16",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "observability": { "enabled": true, "head_sampling_rate": 0.1 },
+  "triggers": { "crons": ["*/5 * * * *"] },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://passalaconciergerie.com,https://www.passalaconciergerie.com,https://passalaconciergerie.netlify.app"
+  },
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "passala-reservations",
+    "database_id": "00000000-0000-0000-0000-000000000000",
+    "migrations_dir": "migrations"
+  }]
+}
