@@ -1,214 +1,62 @@
-// Passala Conciergerie — Calendrier de disponibilité (client + admin)
-// Rouge = indisponible (table "availability"), Vert = disponible.
-// L'admin gère les indisponibilités via admin-calendrier.html ; ce fichier
-// lit la table "availability" pour construire un calendrier visuel.
-
+// Dates represent occupied nights. A booked arrival can be a previous guest's departure.
 const MONTH_NAMES_FR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 const DAY_NAMES_FR = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-
 function pad2(n) { return String(n).padStart(2, '0'); }
 function dateKey(y, m, d) { return `${y}-${pad2(m + 1)}-${pad2(d)}`; }
-function todayKey() { const t = new Date(); return dateKey(t.getFullYear(), t.getMonth(), t.getDate()); }
-
+function todayKey() { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()); }
+function nextDay(key, offset = 1) { return new Date(Date.parse(key + 'T00:00:00Z') + offset * 86400000).toISOString().slice(0, 10); }
 async function fetchUnavailableDates(propertyId) {
-  const res = await fetch('tables/availability?limit=1000');
-  const json = await res.json();
-  const set = new Set();
-  (json.data || []).forEach(row => {
-    if (!row.deleted && row.property_id === propertyId && row.status === 'Indisponible' && row.date) {
-      set.add(row.date);
-    }
-  });
-  return set;
+  const result = await Passala.api('/availability?property_id=' + encodeURIComponent(propertyId));
+  return new Set(result.dates);
 }
-
-/**
- * Crée un widget de calendrier interactif (2 mois affichés, navigation).
- * options.selectable = true => mode client, clic sélectionne une plage (arrivée/départ)
- * options.onRangeChange(checkin, checkout) => callback quand la plage change
- * options.selectable = false => mode admin en lecture, clic sur un jour appelle options.onDayClick(dateStr)
- */
-function createAvailabilityCalendar(container, opts) {
-  const options = Object.assign({
-    propertyId: null,
-    selectable: true,
-    monthsToShow: 2,
-    onRangeChange: null,
-    onDayClick: null,
-    unavailable: new Set()
-  }, opts || {});
-
-  let viewYear, viewMonth;
-  const now = new Date();
-  viewYear = now.getFullYear();
-  viewMonth = now.getMonth();
-
-  let rangeStart = null;
-  let rangeEnd = null;
-
-  function isPast(y, m, d) {
-    return dateKey(y, m, d) < todayKey();
+function createAvailabilityCalendar(container, opts = {}) {
+  const options = { selectable: true, monthsToShow: 2, unavailable: new Set(), ...opts };
+  const [year, month] = todayKey().split('-').map(Number);
+  let viewYear = year, viewMonth = month - 1, start = null, end = null;
+  const limit = nextDay(todayKey(), 731);
+  const format = key => new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(key + 'T00:00:00Z'));
+  function freeRange(a, b) {
+    if (!a || !b || b <= a || a < todayKey() || b > limit || (Date.parse(b) - Date.parse(a)) / 86400000 > 90) return false;
+    for (const date of options.unavailable) if (date >= a && date < b) return false;
+    return true;
   }
-
-  function isUnavailable(key) {
-    return options.unavailable.has(key);
-  }
-
-  function isInRange(key) {
-    if (!rangeStart) return false;
-    const end = rangeEnd || rangeStart;
-    const lo = rangeStart <= end ? rangeStart : end;
-    const hi = rangeStart <= end ? end : rangeStart;
-    return key >= lo && key <= hi;
-  }
-
-  function hasUnavailableBetween(startKey, endKey) {
-    const lo = startKey <= endKey ? startKey : endKey;
-    const hi = startKey <= endKey ? endKey : startKey;
-    for (const d of options.unavailable) {
-      if (d > lo && d < hi) return true;
-    }
-    return false;
-  }
-
+  function notify() { if (options.onRangeChange) options.onRangeChange(start, end); }
   function renderMonth(y, m) {
-    const firstDay = new Date(y, m, 1);
-    // Lundi = 0 ... Dimanche = 6
-    let startOffset = (firstDay.getDay() + 6) % 7;
-    const daysInMonth = new Date(y, m + 1, 0).getDate();
-
-    let cells = '';
-    for (let i = 0; i < startOffset; i++) cells += `<span class="cal-cell cal-empty"></span>`;
-
-    for (let d = 1; d <= daysInMonth; d++) {
-      const key = dateKey(y, m, d);
-      const past = isPast(y, m, d);
-      const unavail = isUnavailable(key);
-      const selected = isInRange(key);
-      const isStart = rangeStart === key;
-      const isEnd = (rangeEnd || rangeStart) === key && rangeEnd;
-
-      let cls = 'cal-cell cal-day';
-      if (past) cls += ' cal-past';
-      else if (unavail) cls += ' cal-unavailable';
-      else cls += ' cal-available';
-      if (selected && !past) cls += ' cal-selected';
-      if (isStart) cls += ' cal-range-start';
-      if (isEnd) cls += ' cal-range-end';
-
-      const disabledAttr = (past || (unavail && options.selectable)) ? 'data-disabled="1"' : '';
-      cells += `<button type="button" class="${cls}" data-date="${key}" ${disabledAttr}>${d}</button>`;
+    const offset = (new Date(y, m, 1).getDay() + 6) % 7;
+    let cells = '<span class="cal-cell cal-empty"></span>'.repeat(offset);
+    for (let d = 1; d <= new Date(y, m + 1, 0).getDate(); d++) {
+      const key = dateKey(y, m, d), unavailable = options.unavailable.has(key);
+      const past = key < todayKey(), outside = key >= limit;
+      const departure = options.selectable && start && !end && freeRange(start, key);
+      const disabled = past || (options.selectable && ((unavailable || outside) && !departure));
+      const selected = start && key >= start && key <= (end || start);
+      const cls = ['cal-cell cal-day', past || outside ? 'cal-past' : unavailable ? 'cal-unavailable' : 'cal-available', selected ? 'cal-selected' : '', key === start ? 'cal-range-start' : '', key === end ? 'cal-range-end' : '', unavailable && departure ? 'cal-departure' : ''].join(' ');
+      const label = `${format(key)} — ${unavailable ? 'nuit indisponible' : 'nuit disponible'}${unavailable && departure ? ', départ possible' : ''}`;
+      cells += `<button type="button" class="${cls}" data-date="${key}" ${disabled ? 'disabled' : ''} aria-label="${label}" aria-pressed="${Boolean(selected)}">${d}</button>`;
     }
-
-    return `
-      <div class="cal-month">
-        <div class="cal-month-title">${MONTH_NAMES_FR[m]} ${y}</div>
-        <div class="cal-weekdays">${DAY_NAMES_FR.map(d => `<span>${d}</span>`).join('')}</div>
-        <div class="cal-grid">${cells}</div>
-      </div>`;
+    return `<div class="cal-month"><div class="cal-month-title">${MONTH_NAMES_FR[m]} ${y}</div><div class="cal-weekdays">${DAY_NAMES_FR.map(d => `<span>${d}</span>`).join('')}</div><div class="cal-grid">${cells}</div></div>`;
   }
-
   function render() {
-    let monthsHTML = '';
-    let y = viewYear, m = viewMonth;
-    for (let i = 0; i < options.monthsToShow; i++) {
-      monthsHTML += renderMonth(y, m);
-      m++;
-      if (m > 11) { m = 0; y++; }
-    }
-
-    container.innerHTML = `
-      <div class="cal-widget">
-        <div class="cal-nav">
-          <button type="button" class="cal-nav-btn" id="cal-prev" aria-label="Mois précédent"><i class="fa-solid fa-chevron-left"></i></button>
-          <div class="cal-legend">
-            <span class="cal-legend-item"><i class="cal-dot cal-dot-green"></i> Disponible</span>
-            <span class="cal-legend-item"><i class="cal-dot cal-dot-red"></i> Indisponible</span>
-          </div>
-          <button type="button" class="cal-nav-btn" id="cal-next" aria-label="Mois suivant"><i class="fa-solid fa-chevron-right"></i></button>
-        </div>
-        <div class="cal-months">${monthsHTML}</div>
-        ${options.selectable ? `<p class="cal-range-summary" id="cal-range-summary">Sélectionnez votre date d'arrivée, puis votre date de départ.</p>` : ''}
-      </div>`;
-
-    container.querySelector('#cal-prev').addEventListener('click', () => {
-      viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; }
-      render();
-    });
-    container.querySelector('#cal-next').addEventListener('click', () => {
-      viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; }
-      render();
-    });
-
-    container.querySelectorAll('.cal-day').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const key = btn.getAttribute('data-date');
-        if (btn.getAttribute('data-disabled') === '1') {
-          if (!options.selectable && options.onDayClick) options.onDayClick(key, isUnavailable(key));
-          return;
-        }
-        if (options.selectable) {
-          handleSelect(key);
-        } else if (options.onDayClick) {
-          options.onDayClick(key, isUnavailable(key));
-        }
-      });
-    });
+    let months = '', y = viewYear, m = viewMonth;
+    for (let i = 0; i < options.monthsToShow; i++) { months += renderMonth(y, m); if (++m > 11) { m = 0; y++; } }
+    const summary = end ? `Arrivée le ${format(start)} — départ le ${format(end)}` : start ? `Arrivée le ${format(start)} — choisissez votre départ.` : 'Sélectionnez votre arrivée, puis votre départ (90 nuits maximum).';
+    container.innerHTML = `<div class="cal-widget"><div class="cal-nav"><button type="button" class="cal-nav-btn" data-nav="-1" aria-label="Mois précédent" ${viewYear === year && viewMonth === month - 1 ? 'disabled' : ''}>‹</button><div class="cal-legend"><span class="cal-legend-item"><i class="cal-dot cal-dot-green"></i> Libre</span><span class="cal-legend-item"><i class="cal-dot cal-dot-red"></i> Nuit occupée</span></div><button type="button" class="cal-nav-btn" data-nav="1" aria-label="Mois suivant" ${dateKey(viewYear, viewMonth, 1) >= limit.slice(0, 7) + '-01' ? 'disabled' : ''}>›</button></div><div class="cal-months">${months}</div>${options.selectable ? `<p class="cal-range-summary" aria-live="polite">${summary}</p>` : ''}</div>`;
+    container.querySelectorAll('[data-nav]').forEach(button => button.addEventListener('click', () => {
+      const d = new Date(viewYear, viewMonth + Number(button.dataset.nav), 1); viewYear = d.getFullYear(); viewMonth = d.getMonth(); render();
+    }));
+    container.querySelectorAll('[data-date]').forEach(button => button.addEventListener('click', () => {
+      const key = button.dataset.date;
+      if (!options.selectable) { options.onDayClick?.(key, options.unavailable.has(key)); return; }
+      if (start && !end && freeRange(start, key)) end = key;
+      else if (!options.unavailable.has(key)) { start = key === start ? null : key; end = null; }
+      render(); notify();
+    }));
   }
-
-  function handleSelect(key) {
-    if (!rangeStart || (rangeStart && rangeEnd)) {
-      // Nouvelle sélection
-      rangeStart = key;
-      rangeEnd = null;
-    } else {
-      // On a un rangeStart, on choisit la fin
-      if (key === rangeStart) {
-        rangeStart = null; rangeEnd = null;
-      } else if (hasUnavailableBetween(rangeStart, key)) {
-        // Un jour indisponible est compris dans la plage : on repart avec cette date comme nouveau départ
-        rangeStart = key;
-        rangeEnd = null;
-      } else if (key < rangeStart) {
-        rangeEnd = rangeStart;
-        rangeStart = key;
-      } else {
-        rangeEnd = key;
-      }
-    }
-    render();
-    const summary = container.querySelector('#cal-range-summary');
-    if (summary) {
-      if (rangeStart && rangeEnd) {
-        summary.innerHTML = `Arrivée le <strong>${formatFr(rangeStart)}</strong> — Départ le <strong>${formatFr(rangeEnd)}</strong>`;
-      } else if (rangeStart) {
-        summary.innerHTML = `Arrivée le <strong>${formatFr(rangeStart)}</strong> — sélectionnez votre date de départ`;
-      } else {
-        summary.innerHTML = `Sélectionnez votre date d'arrivée, puis votre date de départ.`;
-      }
-    }
-    if (options.onRangeChange) options.onRangeChange(rangeStart, rangeEnd);
-  }
-
-  function formatFr(key) {
-    const [y, m, d] = key.split('-').map(Number);
-    return `${d} ${MONTH_NAMES_FR[m - 1]} ${y}`;
-  }
-
-  function refreshUnavailable(newSet) {
-    options.unavailable = newSet;
-    render();
-  }
-
-  function getRange() {
-    return { checkin: rangeStart, checkout: rangeEnd };
-  }
-
-  function jumpTo(y, m) {
-    viewYear = y; viewMonth = m; render();
-  }
-
   render();
-
-  return { refreshUnavailable, getRange, jumpTo, render };
+  return {
+    refreshUnavailable(set) { options.unavailable = set; if (end && !freeRange(start, end) || start && !end && set.has(start)) { start = null; end = null; notify(); } render(); },
+    getRange() { return { checkin: start, checkout: end }; },
+    reset() { start = null; end = null; render(); notify(); },
+    jumpTo(y, m) { viewYear = y; viewMonth = m; render(); }, render
+  };
 }
