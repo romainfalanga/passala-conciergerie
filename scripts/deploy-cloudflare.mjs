@@ -17,7 +17,32 @@ async function api(path, method = 'GET', body) {
 }
 const config = JSON.parse(await readFile('backend/wrangler.jsonc', 'utf8'));
 // Always scope every request and Wrangler operation to the account from the repository secret.
-const databases = await api('/d1/database?name=' + name);
+let databases;
+try {
+  databases = await api('/d1/database?name=' + name);
+} catch (error) {
+  // Read-only diagnostics: never print token IDs, account data, or full responses.
+  const checks = [
+    ['Jeton utilisateur', '/user/tokens/verify'],
+    ['Jeton du compte cible', base + '/tokens/verify'],
+    ['Accès Workers du compte cible', base + '/workers/scripts']
+  ];
+  let verified = false;
+  for (const [label, path] of checks) {
+    if (label === 'Jeton du compte cible' && verified) continue;
+    try {
+      const response = await fetch('https://api.cloudflare.com/client/v4' + path, {
+        headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(10000)
+      });
+      const result = await response.json();
+      const state = ['active', 'disabled', 'expired'].includes(result.result?.status) ? result.result.status : '';
+      if (state === 'active' && result.success) verified = true;
+      const codes = result.errors?.map(e => Number(e.code)).filter(Number.isFinite).join(',') || '';
+      console.log(`${label}: HTTP ${response.status}, ${result.success ? 'autorisé' : 'refusé'}${state ? ', ' + state : ''}${codes ? ', codes ' + codes : ''}`);
+    } catch { console.log(`${label}: diagnostic indisponible`); }
+  }
+  throw error;
+}
 let database = databases.find(db => db.name === name);
 if (!database) database = await api('/d1/database', 'POST', { name, jurisdiction: 'eu' });
 config.account_id = account;
