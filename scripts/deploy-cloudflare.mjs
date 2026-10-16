@@ -1,10 +1,12 @@
 // This script runs inside GitHub Actions. It never exports or prints secret values.
 import { readFile, writeFile, appendFile, rm } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
-const token = process.env.CLOUDFLARE_API_TOKEN;
-const account = process.env.CLOUDFLARE_ACCOUNT_ID;
+const token = process.env.CLOUDFLARE_API_TOKEN?.trim();
+const account = process.env.CLOUDFLARE_ACCOUNT_ID?.trim();
 if (!token || !account) throw new Error('Ajoutez CLOUDFLARE_API_TOKEN et CLOUDFLARE_ACCOUNT_ID aux secrets Actions du dépôt.');
 if (!/^[a-f0-9]{32}$/i.test(account)) throw new Error('CLOUDFLARE_ACCOUNT_ID doit contenir uniquement les 32 caractères de l’identifiant du compte.');
+process.env.CLOUDFLARE_API_TOKEN = token;
+process.env.CLOUDFLARE_ACCOUNT_ID = account;
 const name = 'passala-reservations';
 const base = `/accounts/${account}`;
 async function api(path, method = 'GET', body) {

@@ -15,7 +15,7 @@
     "@cloudflare/workers-types": "5.20261016.1",
     "@types/node": "^24.19.2",
     "esbuild": "0.25.12",
-    "miniflare": "4.20260730.0",
+    "miniflare": "5.20261012.1-beta",
     "typescript": "5.9.3",
     "wrangler": "4.151.1"
   }

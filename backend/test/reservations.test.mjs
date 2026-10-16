@@ -2,7 +2,7 @@ import { before, beforeEach, after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
 import { build } from 'esbuild';
-import { Miniflare } from 'miniflare';
+import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
 
 let mf, db, cookie;
 const origin = 'https://passalaconciergerie.com';
@@ -18,7 +18,7 @@ async function status(id, state, version = 1) { return call('/admin/bookings/' +
 
 before(async () => {
   await build({ entryPoints: ['backend/src/index.ts'], bundle: true, format: 'esm', platform: 'browser', external: ['node:*'], outfile: 'backend/test/worker-bundle.mjs' });
-  mf = new Miniflare({ modules: true, scriptPath: 'backend/test/worker-bundle.mjs', compatibilityDate: '2026-07-30', compatibilityFlags: ['nodejs_compat'], d1Databases: ['DB'], bindings: { ALLOWED_ORIGINS: origin, ADMIN_PASSWORD: password } });
+  mf = new Miniflare(convertV4MiniflareOptions({ modules: true, scriptPath: 'backend/test/worker-bundle.mjs', compatibilityDate: '2026-10-16', compatibilityFlags: ['nodejs_compat'], d1Databases: ['DB'], bindings: { ALLOWED_ORIGINS: origin, ADMIN_PASSWORD: password } }));
   db = await mf.getD1Database('DB');
   for (const file of (await readdir('backend/migrations')).sort()) {
     const sql = await readFile('backend/migrations/' + file, 'utf8');
