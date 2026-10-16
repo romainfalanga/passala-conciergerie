@@ -1,7 +1,14 @@
 // This script runs inside GitHub Actions. It never exports or prints secret values.
 import { readFile, writeFile, appendFile, rm } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
-const token = process.env.CLOUDFLARE_API_TOKEN?.trim();
+// Accept a pasted token or its standard Authorization header, without exposing it.
+let token = process.env.CLOUDFLARE_API_TOKEN?.trim();
+if (token) {
+  const unquote = value => ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) ? value.slice(1, -1).trim() : value;
+  token = unquote(token);
+  token = token.replace(/^(?:Authorization:\s*)?Bearer\s+/i, '').trim();
+  token = unquote(token);
+}
 const account = process.env.CLOUDFLARE_ACCOUNT_ID?.trim();
 if (!token || !account) throw new Error('Ajoutez CLOUDFLARE_API_TOKEN et CLOUDFLARE_ACCOUNT_ID aux secrets Actions du dépôt.');
 if (!/^[a-f0-9]{32}$/i.test(account)) throw new Error('CLOUDFLARE_ACCOUNT_ID doit contenir uniquement les 32 caractères de l’identifiant du compte.');
@@ -22,6 +29,8 @@ try {
   databases = await api('/d1/database?name=' + name);
 } catch (error) {
   // Read-only diagnostics: never print token IDs, account data, or full responses.
+  if (/^[a-f0-9]{32}$/i.test(token)) console.log('La valeur du secret ressemble à un identifiant de 32 caractères, pas à un jeton API Cloudflare.');
+  if (/\s/.test(token)) console.log('Le secret contient encore des espaces internes ; copier uniquement la valeur du jeton.');
   const checks = [
     ['Jeton utilisateur', '/user/tokens/verify'],
     ['Jeton du compte cible', base + '/tokens/verify'],
@@ -37,7 +46,7 @@ try {
       const result = await response.json();
       const state = ['active', 'disabled', 'expired'].includes(result.result?.status) ? result.result.status : '';
       if (state === 'active' && result.success) verified = true;
-      const codes = result.errors?.map(e => Number(e.code)).filter(Number.isFinite).join(',') || '';
+      const codes = result.errors?.flatMap(e => [e.code, ...(e.error_chain || []).map(c => c.code)]).map(Number).filter(Number.isFinite).join(',') || '';
       console.log(`${label}: HTTP ${response.status}, ${result.success ? 'autorisé' : 'refusé'}${state ? ', ' + state : ''}${codes ? ', codes ' + codes : ''}`);
     } catch { console.log(`${label}: diagnostic indisponible`); }
   }
