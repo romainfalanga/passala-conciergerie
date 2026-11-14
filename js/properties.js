@@ -37,16 +37,42 @@ function amenityIcon(name) {
   return AMENITY_ICONS[name] || 'fa-circle-check';
 }
 
+// Détecte si la réponse de l'API tables/* est bien du JSON exploitable.
+// Sur un hébergement statique (ex. Netlify) sans backend Genspark, l'appel
+// à "tables/..." renvoie généralement une page HTML (404) au lieu de JSON :
+// on bascule alors silencieusement sur les données de secours ci-dessous.
+function hasFallbackData() {
+  return typeof PROPERTIES_FALLBACK !== 'undefined' && Array.isArray(PROPERTIES_FALLBACK);
+}
+
 async function fetchProperties() {
-  const res = await fetch('tables/properties?limit=100');
-  const json = await res.json();
-  return (json.data || []).filter(p => !p.deleted);
+  try {
+    const res = await fetch('tables/properties?limit=100');
+    const contentType = res.headers.get('content-type') || '';
+    if (!res.ok || contentType.indexOf('json') === -1) throw new Error('API tables indisponible (hébergement statique sans backend)');
+    const json = await res.json();
+    const data = (json.data || []).filter(p => !p.deleted);
+    if (!data.length && hasFallbackData()) return PROPERTIES_FALLBACK;
+    return data;
+  } catch (e) {
+    console.warn('Table API indisponible, utilisation des données de secours locales.', e);
+    return hasFallbackData() ? PROPERTIES_FALLBACK : [];
+  }
 }
 
 async function fetchProperty(id) {
-  const res = await fetch('tables/properties/' + encodeURIComponent(id));
-  if (!res.ok) return null;
-  return await res.json();
+  try {
+    const res = await fetch('tables/properties/' + encodeURIComponent(id));
+    const contentType = res.headers.get('content-type') || '';
+    if (!res.ok || contentType.indexOf('json') === -1) throw new Error('API tables indisponible (hébergement statique sans backend)');
+    return await res.json();
+  } catch (e) {
+    console.warn('Table API indisponible, utilisation des données de secours locales.', e);
+    if (hasFallbackData()) {
+      return PROPERTIES_FALLBACK.find(p => p.id === id) || null;
+    }
+    return null;
+  }
 }
 
 function propertyCardHTML(p) {
@@ -54,7 +80,7 @@ function propertyCardHTML(p) {
     <article class="property-card" data-type="${p.type}">
       <a href="bien.html?id=${encodeURIComponent(p.id)}" class="thumb">
         <span class="tag">${p.type}</span>
-        <img src="${p.image_main}" alt="${p.name} — ${p.location}" loading="lazy">
+        <img src="${p.image_main}" alt="${p.name}, ${p.location}" loading="lazy">
       </a>
       <div class="body">
         <h3><a href="bien.html?id=${encodeURIComponent(p.id)}">${p.name}</a></h3>
@@ -108,7 +134,7 @@ async function renderPropertyDetail() {
       root.innerHTML = '<div class="container text-center" style="padding:120px 0;"><h2>Ce bien n\'est plus disponible</h2><a href="nos-biens.html" class="btn btn-primary">Voir tous nos biens</a></div>';
       return;
     }
-    document.title = p.name + ' — ' + p.location + ' | Passala Conciergerie';
+    document.title = p.name + ' - ' + p.location + ' | Passala Conciergerie';
 
     const amenities = (p.amenities || []).map(a => `<li><i class="fa-solid ${amenityIcon(a)}"></i> ${a}</li>`).join('');
 
@@ -200,11 +226,11 @@ function propertyGalleryHTML(p) {
   const thumbs = all.slice(1, 5);
 
   const thumbsHTML = thumbs.map((src, i) => `
-      <a href="${src}" target="_blank" rel="noopener" class="thumb-photo"><img src="${src}" alt="${p.name} — vue ${i + 2}" loading="lazy"></a>`).join('');
+      <a href="${src}" target="_blank" rel="noopener" class="thumb-photo"><img src="${src}" alt="${p.name}, vue ${i + 2}" loading="lazy"></a>`).join('');
 
   return `
     <div class="property-gallery count-${Math.min(count, 4) || 1}">
-      <a href="${main}" target="_blank" rel="noopener" class="main-photo"><img src="${main}" alt="${p.name} — vue principale"></a>
+      <a href="${main}" target="_blank" rel="noopener" class="main-photo"><img src="${main}" alt="${p.name}, vue principale"></a>
       ${thumbsHTML}
     </div>`;
 }
@@ -215,7 +241,7 @@ function bookingModalHTML(p) {
       <div class="booking-modal">
         <button type="button" class="booking-modal-close" id="booking-modal-close" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
         <span class="eyebrow">Réservation directe</span>
-        <h3 id="booking-modal-title">Réserver — ${p.name}</h3>
+        <h3 id="booking-modal-title">Réserver ${p.name}</h3>
         <div id="booking-calendar" style="margin-bottom:22px;"></div>
         <form id="booking-form">
           <input type="hidden" id="bk_checkin" name="checkin">

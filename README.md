@@ -140,4 +140,34 @@ Contrairement à l'ancienne charte (multicolore, une couleur différente par car
 
 ## 🌐 Déploiement
 
-Pour rendre le site accessible en ligne, direction l'onglet **Publish** du projet : il gère automatiquement le déploiement et vous fournit l'URL publique.
+Pour rendre le site accessible en ligne depuis Genspark, direction l'onglet **Publish** du projet : il gère automatiquement le déploiement et vous fournit l'URL publique (Hosted Deploy avec une vraie base Cloudflare D1).
+
+### ⚠️ Cas particulier : déploiement manuel GitHub → Netlify
+
+Vous publiez ce site vous-même via **GitHub → Netlify → passalaconciergerie.com**, en dehors du circuit Genspark. C'est un choix tout à fait possible, mais il faut en connaître une limite technique importante :
+
+- Toutes les données dynamiques du site (biens, disponibilités, réservations, avis, leads) passent par des appels `fetch('tables/...')`. Cette API **n'existe que dans l'environnement Genspark** (aperçu du projet, ou après une Hosted Deploy qui provisionne une vraie base Cloudflare D1 + un Worker qui sert ces routes).
+- **Netlify ne sait pas répondre à `tables/...`** : ce sont de simples fichiers statiques, sans aucun serveur/API derrière. C'est exactement la cause du bug « aucun bien à afficher » que vous avez constaté sur `passalaconciergerie.com`.
+- **Solution mise en place dans ce correctif** : un fichier `js/properties-fallback.js` contient une copie statique du bien « Le Cosi ». Si l'appel à `tables/properties` échoue (404, réponse non-JSON...), `js/properties.js` bascule automatiquement sur cette copie de secours, pour que la page « Nos biens » et la fiche du bien s'affichent quand même sur Netlify. **Limite** : si vous ajoutez/modifiez un bien via l'espace propriétaire (`admin-espace.html`), la vraie table Genspark est mise à jour, mais le fichier `js/properties-fallback.js` ne l'est pas automatiquement — il faudra me redemander de le synchroniser, ou migrer vers une vraie solution ci-dessous.
+- Calendrier de disponibilité, réservation directe et formulaire de contact (tables `availability`, `booking_requests`, `leads`) n'ont **pas** de solution de secours équivalente : sur Netlify, ces fonctionnalités resteront non fonctionnelles tant que le site n'a pas une vraie base de données branchée.
+
+**Deux vraies solutions, à votre choix :**
+1. **Publier via Genspark (Hosted Deploy)** au lieu de Netlify : une vraie base Cloudflare D1 est provisionnée automatiquement, toutes les fonctionnalités dynamiques marchent nativement, sans fallback bricolé. Il suffit de pointer votre nom de domaine `passalaconciergerie.com` vers le déploiement Genspark.
+2. **Construire un vrai backend séparé** (ex. un Worker Cloudflare + D1 à vous, ou tout autre service), et réécrire les appels `tables/...` dans `js/*.js` pour qu'ils pointent vers cette nouvelle API. Cela demande un travail de développement backend que je ne peux pas exécuter directement (pas d'accès shell/wrangler/API Cloudflare depuis cet outil).
+
+## 🔑 Espace propriétaire : mot de passe (admin-espace.html)
+
+`admin-espace.html` est maintenant protégé par un **écran de connexion avec mot de passe** avant d'accéder au contenu (calendrier, notes, et désormais **fiche complète du bien** : nom, description, capacité, équipements, photos, liens de réservation, avec possibilité d'ajouter un nouveau bien).
+
+- Mot de passe actuel : `Passala2026` (modifiable dans le code, variable `ADMIN_PASSWORD` tout en haut du `<script>` en bas de `admin-espace.html`).
+- ⚠️ **Cette protection est uniquement côté navigateur (JavaScript)** : sur un hébergement statique externe comme Netlify, n'importe qui peut lire le mot de passe dans le code source de la page. Ce n'est donc **pas une vraie sécurité**, juste une barrière contre une découverte accidentelle du lien.
+- **Pour une vraie protection appliquée côté serveur** (impossible à contourner même en lisant le code), il faut utiliser la Hosted Deploy de Genspark avec une règle d'accès `authenticated` (déjà documentée plus haut) — ce qui implique de publier via Genspark plutôt que Netlify pour cette page au minimum.
+
+## 🖼️ Logo et favicon sans fond
+
+- `images/logo-passala.png` a été retraité pour **supprimer son fond noir** (suppression d'arrière-plan IA) : il s'agit désormais d'un vrai PNG transparent, utilisé dans le footer de toutes les pages (plus besoin de `mix-blend-mode` pour le fondre dans le fond marine).
+- `images/favicon-key.png` : extraction de la clé dorée du logo, recomposée en icône carrée à fond transparent, utilisée comme **favicon** (`<link rel="icon">` et `<link rel="apple-touch-icon">`) sur les 8 pages du site.
+
+## ➖ Tirets cadratin
+
+Tous les tirets cadratin (—) visibles dans le texte du site (titres de pages, footer, intro de la page Nettoyage, libellés de prix, textes du calendrier de réservation, sujet d'email mailto, libellés du dashboard admin) ont été retirés et remplacés par une virgule, des parenthèses, un tiret simple ou une reformulation selon le contexte. Les tirets restants dans `README.md` et les commentaires de code (`css/style.css`, `js/*.js`) n'ont pas été touchés : ils ne sont jamais visibles par un visiteur du site.

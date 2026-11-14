@@ -180,9 +180,9 @@ function createAvailabilityCalendar(container, opts) {
     const summary = container.querySelector('#cal-range-summary');
     if (summary) {
       if (rangeStart && rangeEnd) {
-        summary.innerHTML = `Arrivée le <strong>${formatFr(rangeStart)}</strong> — Départ le <strong>${formatFr(rangeEnd)}</strong>`;
+        summary.innerHTML = `Arrivée le <strong>${formatFr(rangeStart)}</strong>, départ le <strong>${formatFr(rangeEnd)}</strong>`;
       } else if (rangeStart) {
-        summary.innerHTML = `Arrivée le <strong>${formatFr(rangeStart)}</strong> — sélectionnez votre date de départ`;
+        summary.innerHTML = `Arrivée le <strong>${formatFr(rangeStart)}</strong>, sélectionnez votre date de départ`;
       } else {
         summary.innerHTML = `Sélectionnez votre date d'arrivée, puis votre date de départ.`;
       }

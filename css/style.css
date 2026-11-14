@@ -414,7 +414,7 @@ section { padding: 90px 0; }
 #site-footer {
   background: var(--color-navy);
   color: #c3d3dc;
-  padding: 70px 0 30px;
+  padding: 36px 0 30px;
 }
 .footer-grid {
   display: grid;
@@ -425,7 +425,14 @@ section { padding: 90px 0; }
 @media (max-width: 800px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
 #site-footer h4 { color: var(--color-white); font-family: var(--font-sans); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 18px; }
 #site-footer .brand { color: var(--color-white); margin-bottom: 14px; }
-.brand-logo-footer { height: 84px; width: auto; margin-bottom: 16px; }
+.brand-logo-footer {
+  height: 150px;
+  width: auto;
+  margin: -4px 0 18px -14px;
+  display: block;
+}
+@media (max-width: 800px) { .brand-logo-footer { height: 120px; } }
+@media (max-width: 480px) { .brand-logo-footer { height: 100px; margin-left: -8px; } }
 .footer-brand-name {
   font-family: var(--font-serif);
   font-style: italic;

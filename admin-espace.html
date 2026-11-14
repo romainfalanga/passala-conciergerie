@@ -3,12 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Espace propriétaire — Passala Conciergerie</title>
+<title>Espace propriétaire - Passala Conciergerie</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
 <link rel="stylesheet" href="css/style.css">
+<link rel="icon" type="image/png" href="images/favicon-key.png">
+<link rel="apple-touch-icon" href="images/favicon-key.png">
 <style>
   #admin-page { padding: 60px 0 100px; }
   #admin-page .container { max-width: 760px; }
@@ -34,6 +36,32 @@
   .admin-section-title i { color: var(--color-gold-dark); }
   .admin-block { margin-bottom: 50px; }
   .admin-block:last-child { margin-bottom: 0; }
+  .property-form-card { background: var(--color-white); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-card); }
+  .property-form-card .field { margin-bottom: 16px; }
+  .property-form-card label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
+  .property-form-card input, .property-form-card textarea, .property-form-card select {
+    width: 100%; padding: 11px 14px; border-radius: var(--radius-md);
+    border: 1.5px solid rgba(20,37,52,0.16); font-family: var(--font-sans);
+    font-size: 0.94rem; background: var(--color-cream); color: var(--color-ink);
+  }
+  .property-form-card textarea { min-height: 90px; resize: vertical; }
+  .property-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+  @media (max-width: 600px) { .property-form-grid { grid-template-columns: 1fr; } }
+  .property-form-grid .field-full { grid-column: 1 / -1; }
+  .checkbox-field-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .checkbox-field-row input { width: auto; }
+  .form-section-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-ink-soft); margin: 22px 0 10px; font-weight: 700; }
+  .form-section-label:first-child { margin-top: 0; }
+  .property-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+  .property-actions .btn { flex: 1; min-width: 180px; }
+  .btn-danger { background: #963f27; color: #fff; border: none; }
+  .btn-danger:hover { background: #7a3220; }
+  .login-gate { max-width: 420px; margin: 100px auto; background: var(--color-white); border-radius: var(--radius-lg); padding: 36px 32px; box-shadow: var(--shadow-soft); text-align: center; }
+  .login-gate h1 { font-size: 1.4rem; margin-bottom: 10px; }
+  .login-gate p { font-size: 0.9rem; color: var(--color-ink-soft); margin-bottom: 20px; }
+  .login-gate input { width: 100%; padding: 13px 16px; border-radius: var(--radius-md); border: 1.5px solid rgba(20,37,52,0.16); font-family: var(--font-sans); font-size: 1rem; margin-bottom: 14px; text-align: center; letter-spacing: 0.1em; }
+  .login-gate .error-msg { color: #963f27; font-size: 0.88rem; margin-top: 10px; display: none; }
+  #admin-page.locked #admin-content { display: none; }
 </style>
 </head>
 <body>
@@ -46,19 +74,90 @@
   </div>
 </header>
 
-<main id="admin-page">
-  <div class="container">
+<div id="login-gate" class="login-gate">
+  <h1><i class="fa-solid fa-lock"></i> Espace propriétaire</h1>
+  <p>Cette page est réservée au propriétaire. Merci de saisir le mot de passe pour accéder à la gestion des biens.</p>
+  <input type="password" id="admin-password-input" placeholder="Mot de passe" autocomplete="current-password">
+  <button type="button" class="btn btn-primary btn-block" id="admin-login-btn"><i class="fa-solid fa-right-to-bracket"></i> Accéder à mon espace</button>
+  <p class="error-msg" id="admin-login-error">Mot de passe incorrect. Merci de réessayer.</p>
+</div>
+
+<main id="admin-page" class="locked">
+  <div class="container" id="admin-content">
     <div class="admin-intro">
       <span class="eyebrow">Espace propriétaire</span>
       <h1 style="font-size:1.8rem;">Gestion de vos biens</h1>
-      <p>Choisissez un bien ci-dessous : vous pourrez ensuite gérer son calendrier de disponibilité et ses notes Airbnb / Booking depuis cette même page.</p>
-      <p style="color:var(--color-terracotta-dark);font-weight:600;">⚠️ Cette page n'est pas listée dans le menu du site — ne partagez son lien qu'en interne.</p>
+      <p>Choisissez un bien ci-dessous : vous pourrez ensuite gérer sa fiche complète, son calendrier de disponibilité et ses notes Airbnb / Booking depuis cette même page.</p>
+      <p style="color:var(--color-terracotta-dark);font-weight:600;">⚠️ Cette page n'est pas listée dans le menu du site, ne partagez son lien qu'en interne.</p>
     </div>
 
     <div class="admin-select">
       <label for="admin-property-select" style="display:block;font-weight:600;margin-bottom:8px;">Bien à gérer</label>
       <select id="admin-property-select"></select>
     </div>
+
+    <!-- FICHE DU BIEN -->
+    <section class="admin-block">
+      <h2 class="admin-section-title"><i class="fa-solid fa-house"></i> Fiche du bien</h2>
+      <p style="margin-bottom:18px;font-size:0.94rem;">Modifiez ici le nom, la description, la capacité, les équipements et les liens de réservation du bien sélectionné. Les changements sont visibles immédiatement sur le site (dans l'aperçu Genspark ; sur une publication Netlify séparée, voir la note en bas de page).</p>
+      <div class="property-form-card">
+        <form id="property-form">
+          <div class="form-section-label">Informations générales</div>
+          <div class="property-form-grid">
+            <div class="field"><label for="pf_name">Nom du bien</label><input type="text" id="pf_name" name="name" required></div>
+            <div class="field"><label for="pf_type">Type</label>
+              <select id="pf_type" name="type">
+                <option>Villa</option><option>Mas</option><option>Bastide</option>
+                <option>Appartement</option><option>Maison</option><option>Studio</option>
+              </select>
+            </div>
+            <div class="field field-full"><label for="pf_location">Ville / secteur</label><input type="text" id="pf_location" name="location"></div>
+            <div class="field"><label for="pf_capacity">Capacité (pers.)</label><input type="number" id="pf_capacity" name="capacity" min="1"></div>
+            <div class="field"><label for="pf_bedrooms">Chambres</label><input type="number" id="pf_bedrooms" name="bedrooms" min="0"></div>
+            <div class="field"><label for="pf_bathrooms">Salles de bain</label><input type="number" id="pf_bathrooms" name="bathrooms" min="0"></div>
+            <div class="field"><label for="pf_surface">Surface (m²)</label><input type="number" id="pf_surface" name="surface" min="0"></div>
+          </div>
+
+          <div class="form-section-label">Descriptions</div>
+          <div class="field"><label for="pf_short_description">Description courte (pour les cartes)</label><textarea id="pf_short_description" name="short_description" style="min-height:60px;"></textarea></div>
+          <div class="field"><label for="pf_description">Description complète</label><textarea id="pf_description" name="description"></textarea></div>
+          <div class="field"><label for="pf_amenities">Équipements (séparés par des virgules)</label><textarea id="pf_amenities" name="amenities" style="min-height:60px;" placeholder="Wifi, Télévision, Parking privé..."></textarea></div>
+
+          <div class="form-section-label">Photos (URLs)</div>
+          <div class="property-form-grid">
+            <div class="field field-full"><label for="pf_image_main">Image principale</label><input type="text" id="pf_image_main" name="image_main" placeholder="images/mon-bien.jpg"></div>
+            <div class="field"><label for="pf_image_gallery_1">Galerie 1</label><input type="text" id="pf_image_gallery_1" name="image_gallery_1"></div>
+            <div class="field"><label for="pf_image_gallery_2">Galerie 2</label><input type="text" id="pf_image_gallery_2" name="image_gallery_2"></div>
+            <div class="field"><label for="pf_image_gallery_3">Galerie 3</label><input type="text" id="pf_image_gallery_3" name="image_gallery_3"></div>
+            <div class="field"><label for="pf_image_gallery_4">Galerie 4</label><input type="text" id="pf_image_gallery_4" name="image_gallery_4"></div>
+          </div>
+
+          <div class="form-section-label">Réservation</div>
+          <div class="checkbox-field-row">
+            <input type="checkbox" id="pf_direct_booking" name="direct_booking">
+            <label for="pf_direct_booking" style="margin-bottom:0;">Activer la réservation directe sur le site</label>
+          </div>
+          <div class="checkbox-field-row">
+            <input type="checkbox" id="pf_accepts_pets" name="accepts_pets">
+            <label for="pf_accepts_pets" style="margin-bottom:0;">Animaux acceptés</label>
+          </div>
+          <div class="field"><label for="pf_price_note">Indication tarifaire / statut</label><input type="text" id="pf_price_note" name="price_note"></div>
+          <div class="property-form-grid">
+            <div class="field"><label for="pf_booking_url">Lien Airbnb (ou autre, optionnel)</label><input type="text" id="pf_booking_url" name="booking_url"></div>
+            <div class="field"><label for="pf_booking_label">Libellé du lien</label><input type="text" id="pf_booking_label" name="booking_label" placeholder="Réserver sur Airbnb"></div>
+            <div class="field"><label for="pf_booking_url_2">Lien Booking.com (optionnel)</label><input type="text" id="pf_booking_url_2" name="booking_url_2"></div>
+            <div class="field"><label for="pf_booking_label_2">Libellé du 2e lien</label><input type="text" id="pf_booking_label_2" name="booking_label_2" placeholder="Réserver sur Booking"></div>
+          </div>
+
+          <div class="property-actions">
+            <button type="submit" class="btn btn-primary" id="property-save-btn"><i class="fa-solid fa-floppy-disk"></i> Enregistrer les modifications</button>
+            <button type="button" class="btn btn-outline" id="property-new-btn"><i class="fa-solid fa-plus"></i> Ajouter un nouveau bien</button>
+          </div>
+          <div id="property-feedback"></div>
+        </form>
+      </div>
+      <p class="admin-note">Astuce : pour les photos, uploadez d'abord l'image dans le projet (dossier <code>images/</code>) puis indiquez son chemin ici (ex. <code>images/ma-villa.jpg</code>).</p>
+    </section>
 
     <!-- DISPONIBILITÉS -->
     <section class="admin-block">
@@ -111,19 +210,61 @@
       </div>
       <p class="admin-note">Astuce : laissez un champ vide si la note n'existe pas encore ou ne doit pas s'afficher sur le site.</p>
     </section>
+
+    <p class="admin-note" style="margin-top:40px;">⚠️ Cette protection par mot de passe fonctionne dans l'aperçu Genspark. Si le site est publié tel quel sur un hébergeur externe (ex. Netlify via GitHub), n'importe qui connaissant l'URL de cette page peut voir ce code JavaScript : ce n'est donc pas une sécurité fiable sur cet hébergement, seulement une protection "basique" contre le hasard. Demandez-moi la Hosted Deploy de Genspark si vous voulez une vraie protection appliquée côté serveur.</p>
   </div>
 </main>
 
 <footer id="site-footer">
   <div class="container">
     <div class="footer-bottom" style="border-top:none;padding-top:0;">
-      <span>© 2026 Passala Conciergerie — Espace de gestion interne — SIRET 917 539 371 00026</span>
+      <span>© 2026 Passala Conciergerie – Espace de gestion interne – SIRET 917 539 371 00026</span>
     </div>
   </div>
 </footer>
 
 <script src="js/availability-calendar.js"></script>
 <script>
+// Protection d'accès basique côté client (code en dur, changez-le ici si besoin).
+// ⚠️ Ceci n'est PAS une sécurité serveur : sur un hébergement statique externe
+// (ex. Netlify), le mot de passe est visible dans le code source de la page.
+// Pour une vraie protection appliquée côté serveur, utilisez la Hosted Deploy
+// de Genspark avec une règle d'accès "authenticated" sur cette page.
+const ADMIN_PASSWORD = 'Passala2026';
+const ADMIN_SESSION_KEY = 'passala_admin_unlocked';
+
+(function initGate() {
+  const gate = document.getElementById('login-gate');
+  const page = document.getElementById('admin-page');
+  const input = document.getElementById('admin-password-input');
+  const btn = document.getElementById('admin-login-btn');
+  const errorMsg = document.getElementById('admin-login-error');
+
+  function unlock() {
+    gate.style.display = 'none';
+    page.classList.remove('locked');
+    sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
+  }
+
+  function tryLogin() {
+    if (input.value === ADMIN_PASSWORD) {
+      errorMsg.style.display = 'none';
+      unlock();
+    } else {
+      errorMsg.style.display = 'block';
+    }
+  }
+
+  if (sessionStorage.getItem(ADMIN_SESSION_KEY) === '1') {
+    unlock();
+  }
+
+  btn.addEventListener('click', tryLogin);
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') tryLogin();
+  });
+})();
+
 document.addEventListener('DOMContentLoaded', async function () {
   const select = document.getElementById('admin-property-select');
   const calContainer = document.getElementById('admin-calendar');
@@ -131,6 +272,10 @@ document.addEventListener('DOMContentLoaded', async function () {
   const ratingsForm = document.getElementById('ratings-form');
   const ratingsFeedback = document.getElementById('ratings-feedback');
   const ratingsSubmitBtn = document.getElementById('ratings-submit-btn');
+  const propertyForm = document.getElementById('property-form');
+  const propertyFeedback = document.getElementById('property-feedback');
+  const propertySaveBtn = document.getElementById('property-save-btn');
+  const propertyNewBtn = document.getElementById('property-new-btn');
   let properties = [];
 
   function showCalFeedback(type, text) {
@@ -152,7 +297,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       return;
     }
     select.innerHTML = properties.map(function (p) {
-      return '<option value="' + p.id + '">' + p.name + ' — ' + p.location + '</option>';
+      return '<option value="' + p.id + '">' + p.name + ' - ' + p.location + '</option>';
     }).join('');
   }
 
@@ -169,6 +314,55 @@ document.addEventListener('DOMContentLoaded', async function () {
     ratingsForm.rating_airbnb_count.value = (p.rating_airbnb_count !== undefined && p.rating_airbnb_count !== null) ? p.rating_airbnb_count : '';
     ratingsForm.rating_booking.value = (p.rating_booking !== undefined && p.rating_booking !== null) ? p.rating_booking : '';
     ratingsForm.rating_booking_count.value = (p.rating_booking_count !== undefined && p.rating_booking_count !== null) ? p.rating_booking_count : '';
+  }
+
+  function val(v) { return (v === undefined || v === null) ? '' : v; }
+
+  function fillPropertyForm(p) {
+    propertyForm.name.value = val(p.name);
+    propertyForm.type.value = val(p.type) || 'Villa';
+    propertyForm.location.value = val(p.location);
+    propertyForm.capacity.value = val(p.capacity);
+    propertyForm.bedrooms.value = val(p.bedrooms);
+    propertyForm.bathrooms.value = val(p.bathrooms);
+    propertyForm.surface.value = val(p.surface);
+    propertyForm.short_description.value = val(p.short_description);
+    propertyForm.description.value = val(p.description);
+    propertyForm.amenities.value = Array.isArray(p.amenities) ? p.amenities.join(', ') : '';
+    propertyForm.image_main.value = val(p.image_main);
+    propertyForm.image_gallery_1.value = val(p.image_gallery_1);
+    propertyForm.image_gallery_2.value = val(p.image_gallery_2);
+    propertyForm.image_gallery_3.value = val(p.image_gallery_3);
+    propertyForm.image_gallery_4.value = val(p.image_gallery_4);
+    propertyForm.direct_booking.checked = !!p.direct_booking;
+    propertyForm.accepts_pets.checked = !!p.accepts_pets;
+    propertyForm.price_note.value = val(p.price_note);
+    propertyForm.booking_url.value = val(p.booking_url);
+    propertyForm.booking_label.value = val(p.booking_label);
+    propertyForm.booking_url_2.value = val(p.booking_url_2);
+    propertyForm.booking_label_2.value = val(p.booking_label_2);
+    propertyForm.dataset.mode = 'edit';
+    propertyForm.dataset.editId = p.id;
+    propertySaveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Enregistrer les modifications';
+  }
+
+  function resetPropertyFormForCreate() {
+    propertyForm.reset();
+    propertyForm.type.value = 'Villa';
+    propertyForm.dataset.mode = 'create';
+    delete propertyForm.dataset.editId;
+    propertySaveBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Créer ce nouveau bien';
+    propertyFeedback.className = '';
+    propertyFeedback.innerHTML = '';
+  }
+
+  function slugify(str) {
+    return (str || '')
+      .toString()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || ('bien-' + Date.now());
   }
 
   async function loadCalendarFor(propertyId) {
@@ -220,7 +414,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     ratingsFeedback.className = '';
     ratingsFeedback.innerHTML = '';
     await loadCalendarFor(propertyId);
-    if (p) fillRatingsForm(p);
+    if (p) {
+      fillRatingsForm(p);
+      fillPropertyForm(p);
+    }
   }
 
   await loadProperties();
@@ -229,7 +426,103 @@ document.addEventListener('DOMContentLoaded', async function () {
     select.addEventListener('change', function () {
       selectProperty(select.value);
     });
+  } else {
+    resetPropertyFormForCreate();
   }
+
+  propertyNewBtn.addEventListener('click', function () {
+    resetPropertyFormForCreate();
+    propertyFeedback.className = 'info';
+    propertyFeedback.innerHTML = 'Remplissez le formulaire puis cliquez sur « Créer ce nouveau bien ». Pensez à uploader vos photos dans le dossier images/ au préalable.';
+    propertyFeedback.style.display = 'block';
+  });
+
+  function readPropertyFormData() {
+    const amenitiesRaw = propertyForm.amenities.value || '';
+    const amenities = amenitiesRaw.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    return {
+      name: propertyForm.name.value.trim(),
+      type: propertyForm.type.value,
+      location: propertyForm.location.value.trim(),
+      capacity: propertyForm.capacity.value === '' ? null : parseInt(propertyForm.capacity.value, 10),
+      bedrooms: propertyForm.bedrooms.value === '' ? null : parseInt(propertyForm.bedrooms.value, 10),
+      bathrooms: propertyForm.bathrooms.value === '' ? null : parseInt(propertyForm.bathrooms.value, 10),
+      surface: propertyForm.surface.value === '' ? null : parseInt(propertyForm.surface.value, 10),
+      short_description: propertyForm.short_description.value.trim(),
+      description: propertyForm.description.value.trim(),
+      amenities: amenities,
+      image_main: propertyForm.image_main.value.trim(),
+      image_gallery_1: propertyForm.image_gallery_1.value.trim(),
+      image_gallery_2: propertyForm.image_gallery_2.value.trim(),
+      image_gallery_3: propertyForm.image_gallery_3.value.trim(),
+      image_gallery_4: propertyForm.image_gallery_4.value.trim(),
+      direct_booking: propertyForm.direct_booking.checked,
+      accepts_pets: propertyForm.accepts_pets.checked,
+      price_note: propertyForm.price_note.value.trim(),
+      booking_url: propertyForm.booking_url.value.trim(),
+      booking_label: propertyForm.booking_label.value.trim(),
+      booking_url_2: propertyForm.booking_url_2.value.trim(),
+      booking_label_2: propertyForm.booking_label_2.value.trim()
+    };
+  }
+
+  propertyForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const data = readPropertyFormData();
+    if (!data.name) {
+      propertyFeedback.className = 'error';
+      propertyFeedback.innerHTML = 'Le nom du bien est obligatoire.';
+      return;
+    }
+
+    const isCreate = propertyForm.dataset.mode === 'create';
+    propertySaveBtn.disabled = true;
+    const originalLabel = propertySaveBtn.innerHTML;
+    propertySaveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enregistrement…';
+    propertyFeedback.className = 'info';
+    propertyFeedback.innerHTML = 'Enregistrement en cours…';
+
+    try {
+      if (isCreate) {
+        data.id = slugify(data.name);
+        data.featured = false;
+        const res = await fetch('tables/properties', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Erreur serveur');
+        const created = await res.json();
+        properties.push(created);
+        select.innerHTML += '<option value="' + created.id + '">' + created.name + ' - ' + created.location + '</option>';
+        select.value = created.id;
+        await selectProperty(created.id);
+        propertyFeedback.className = 'success';
+        propertyFeedback.innerHTML = 'Le bien « ' + created.name + ' » a bien été créé et apparaît maintenant sur la page « Nos biens ».';
+      } else {
+        const id = propertyForm.dataset.editId;
+        const res = await fetch('tables/properties/' + encodeURIComponent(id), {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Erreur serveur');
+        const p = currentProperty();
+        if (p) Object.assign(p, data);
+        const opt = select.querySelector('option[value="' + id + '"]');
+        if (opt) opt.textContent = data.name + ' - ' + data.location;
+        propertyFeedback.className = 'success';
+        propertyFeedback.innerHTML = 'La fiche de « ' + data.name + ' » a bien été mise à jour.';
+      }
+    } catch (err) {
+      console.error(err);
+      propertyFeedback.className = 'error';
+      propertyFeedback.innerHTML = 'Une erreur est survenue. Merci de réessayer.';
+    } finally {
+      propertySaveBtn.disabled = false;
+      propertySaveBtn.innerHTML = originalLabel;
+    }
+  });
 
   ratingsForm.addEventListener('submit', async function (e) {
     e.preventDefault();

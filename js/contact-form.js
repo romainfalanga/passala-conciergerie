@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function addMailtoFallback(data) {
-    const subject = encodeURIComponent('Demande d\'étude — ' + data.property_type + ' à ' + data.city);
+    const subject = encodeURIComponent('Demande d\'étude - ' + data.property_type + ' à ' + data.city);
     const body = encodeURIComponent(
       'Nom : ' + data.full_name + '\n' +
       'Téléphone : ' + data.phone + '\n' +
