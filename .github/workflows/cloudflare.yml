@@ -1,21 +1,19 @@
-name: Cloudflare reservations
+name: API Cloudflare
 on:
   push:
-    branches: [main, cloudflare-reservations]
+    branches: [main]
     paths:
       - 'backend/**'
       - 'scripts/**'
       - 'package*.json'
       - 'tsconfig.json'
       - '.github/workflows/cloudflare.yml'
+  pull_request:
   workflow_dispatch:
 permissions:
   contents: read
-concurrency:
-  group: passala-cloudflare-production
-  cancel-in-progress: false
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -24,20 +22,38 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-      - name: Install dependencies
+      - name: Installation
         run: npm ci --ignore-scripts
-      - name: Generate Worker types
+      - name: Types du Worker
         run: npm run types
-      - name: Type check
+      - name: Vérification TypeScript
         run: npm run check
-      - name: Reservation integrity tests
+      - name: Tests de l'API
         run: npm test
-      - name: Deploy D1 and Worker
+
+  # Déploiement automatique : désactivé tant que la variable de dépôt CLOUDFLARE_AUTODEPLOY
+  # ne vaut pas « true ». Il exige un secret CLOUDFLARE_API_TOKEN valable sur le compte
+  # indiqué dans backend/wrangler.jsonc (droits Workers Scripts, D1 et R2 en édition).
+  # Sinon, déployer à la main : npm run deploy:api
+  deploy:
+    needs: test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.CLOUDFLARE_AUTODEPLOY == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: passala-cloudflare-production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Migrations D1 et déploiement du Worker
         run: npm run deploy:api
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           EMAIL_FROM: ${{ secrets.EMAIL_FROM || vars.EMAIL_FROM }}
           NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL || vars.NOTIFY_EMAIL }}

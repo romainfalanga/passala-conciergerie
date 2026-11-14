@@ -1,6 +1,6 @@
 {
   "name": "passala-conciergerie",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,7 +9,8 @@
     "check": "tsc --noEmit",
     "types": "wrangler types backend/worker-configuration.d.ts --config backend/wrangler.jsonc",
     "dev:api": "wrangler dev --config backend/wrangler.jsonc",
-    "deploy:api": "node scripts/deploy-cloudflare.mjs"
+    "deploy:api": "node scripts/deploy-cloudflare.mjs",
+    "admin:create": "node scripts/create-admin.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20261016.1",

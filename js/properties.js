@@ -1,97 +1,46 @@
-// Passala Conciergerie — chargement dynamique des biens depuis la Table API
+// Passala Conciergerie — pages « Nos biens » et « Fiche bien ».
+// Toutes les données viennent de l'API (base Cloudflare D1), gérée depuis l'espace admin.
 
 const AMENITY_ICONS = {
-  "Piscine à débordement": "fa-water-ladder",
-  "Piscine à débordement chauffée": "fa-water-ladder",
-  "Piscine chauffée": "fa-water-ladder",
-  "Piscine 18m": "fa-water-ladder",
-  "Climatisation": "fa-snowflake",
-  "Wifi haut débit": "fa-wifi",
-  "Wifi fibre": "fa-wifi",
-  "Parking privé": "fa-square-parking",
-  "Jardin paysager": "fa-seedling",
-  "Cuisine d'été": "fa-utensils",
-  "Court de tennis": "fa-table-tennis-paddle-ball",
-  "Salle de sport": "fa-dumbbell",
-  "Cave à vin": "fa-wine-bottle",
-  "Sécurité 24/7": "fa-shield-halved",
-  "Service de conciergerie sur place": "fa-concierge-bell",
-  "Vue mer panoramique": "fa-mountain-sun",
-  "Accès direct sentier des Calanques": "fa-person-hiking",
-  "Domotique": "fa-house-signal",
-  "Ménage hôtelier inclus": "fa-broom",
-  "Pool house": "fa-umbrella-beach",
-  "Terrain de pétanque": "fa-baseball",
-  "Vignoble privé": "fa-wine-glass",
-  "Grande salle de réception": "fa-champagne-glasses",
-  "Télévision": "fa-tv",
-  "Parking intérieur privé": "fa-square-parking",
-  "Balcon": "fa-umbrella-beach",
-  "Balcon / terrasse": "fa-umbrella-beach",
-  "Animaux acceptés": "fa-paw",
-  "Entièrement rénové": "fa-sparkles",
-  "Wifi": "fa-wifi"
+  'wifi': 'fa-wifi', 'télévision': 'fa-tv', 'tv': 'fa-tv', 'cuisine': 'fa-utensils', 'parking': 'fa-square-parking',
+  'balcon': 'fa-umbrella-beach', 'terrasse': 'fa-umbrella-beach', 'animaux': 'fa-paw', 'piscine': 'fa-water-ladder',
+  'climatisation': 'fa-snowflake', 'jardin': 'fa-seedling', 'lave-linge': 'fa-soap', 'lave-vaisselle': 'fa-sink',
+  'vue mer': 'fa-mountain-sun', 'plage': 'fa-umbrella-beach', 'barbecue': 'fa-fire', 'ascenseur': 'fa-elevator',
+  'chauffage': 'fa-temperature-arrow-up', 'linge': 'fa-bed', 'ménage': 'fa-broom', 'bébé': 'fa-baby'
 };
-
 function amenityIcon(name) {
-  return AMENITY_ICONS[name] || 'fa-circle-check';
+  const lower = String(name).toLowerCase();
+  const match = Object.keys(AMENITY_ICONS).find(k => lower.includes(k));
+  return match ? AMENITY_ICONS[match] : 'fa-circle-check';
 }
 
-// Détecte si la réponse de l'API tables/* est bien du JSON exploitable.
-// Sur un hébergement statique (ex. Netlify) sans backend Genspark, l'appel
-// à "tables/..." renvoie généralement une page HTML (404) au lieu de JSON :
-// on bascule alors silencieusement sur les données de secours ci-dessous.
-function hasFallbackData() {
-  return typeof PROPERTIES_FALLBACK !== 'undefined' && Array.isArray(PROPERTIES_FALLBACK);
-}
-
-async function fetchProperties() {
-  try {
-    const res = await fetch('tables/properties?limit=100');
-    const contentType = res.headers.get('content-type') || '';
-    if (!res.ok || contentType.indexOf('json') === -1) throw new Error('API tables indisponible (hébergement statique sans backend)');
-    const json = await res.json();
-    const data = (json.data || []).filter(p => !p.deleted);
-    if (!data.length && hasFallbackData()) return PROPERTIES_FALLBACK;
-    return data;
-  } catch (e) {
-    console.warn('Table API indisponible, utilisation des données de secours locales.', e);
-    return hasFallbackData() ? PROPERTIES_FALLBACK : [];
-  }
-}
-
-async function fetchProperty(id) {
-  try {
-    const res = await fetch('tables/properties/' + encodeURIComponent(id));
-    const contentType = res.headers.get('content-type') || '';
-    if (!res.ok || contentType.indexOf('json') === -1) throw new Error('API tables indisponible (hébergement statique sans backend)');
-    return await res.json();
-  } catch (e) {
-    console.warn('Table API indisponible, utilisation des données de secours locales.', e);
-    if (hasFallbackData()) {
-      return PROPERTIES_FALLBACK.find(p => p.id === id) || null;
-    }
-    return null;
-  }
-}
+const esc = v => Passala.escape(v);
+const safeUrl = v => Passala.url(v);
+const PLACEHOLDER = 'images/interior-provencal.jpg';
 
 function propertyCardHTML(p) {
+  const href = 'bien.html?id=' + encodeURIComponent(p.id);
+  const cover = p.photos[0];
+  const meta = [
+    `<span><i class="fa-solid fa-user-group"></i> ${esc(p.capacity)} pers.</span>`,
+    p.bedrooms !== null ? `<span><i class="fa-solid fa-bed"></i> ${esc(p.bedrooms)} ch.</span>` : '',
+    p.bathrooms !== null ? `<span><i class="fa-solid fa-bath"></i> ${esc(p.bathrooms)} sdb</span>` : '',
+    p.surface !== null ? `<span><i class="fa-solid fa-ruler-combined"></i> ${esc(p.surface)} m²</span>` : ''
+  ].join('');
+  const price = p.nightly_price !== null ? `<p class="card-price">À partir de <strong>${Passala.euros(p.nightly_price)}</strong> / nuit</p>` : '';
   return `
-    <article class="property-card" data-type="${p.type}">
-      <a href="bien.html?id=${encodeURIComponent(p.id)}" class="thumb">
-        <span class="tag">${p.type}</span>
-        <img src="${p.image_main}" alt="${p.name}, ${p.location}" loading="lazy">
+    <article class="property-card" data-type="${esc(p.type)}">
+      <a href="${href}" class="thumb">
+        <span class="tag">${esc(p.type)}</span>
+        <img src="${safeUrl(cover?.url) || PLACEHOLDER}" alt="${esc(cover?.alt || p.name)}" loading="lazy">
       </a>
       <div class="body">
-        <h3><a href="bien.html?id=${encodeURIComponent(p.id)}">${p.name}</a></h3>
-        <div class="location"><i class="fa-solid fa-location-dot"></i> ${p.location}</div>
-        <div class="meta">
-          <span><i class="fa-solid fa-user-group"></i> ${p.capacity} pers.</span>
-          <span><i class="fa-solid fa-bed"></i> ${p.bedrooms} ch.</span>
-          <span><i class="fa-solid fa-bath"></i> ${p.bathrooms} sdb</span>
-          <span><i class="fa-solid fa-ruler-combined"></i> ${p.surface} m²</span>
-        </div>
-        <a href="bien.html?id=${encodeURIComponent(p.id)}" class="btn btn-outline btn-block">Découvrir ce bien</a>
+        <h3><a href="${href}">${esc(p.name)}</a></h3>
+        ${p.location ? `<div class="location"><i class="fa-solid fa-location-dot"></i> ${esc(p.location)}</div>` : ''}
+        ${p.short_description ? `<p class="card-summary">${esc(p.short_description)}</p>` : ''}
+        <div class="meta">${meta}</div>
+        ${price}
+        <a href="${href}" class="btn btn-outline btn-block">Découvrir ce bien</a>
       </div>
     </article>`;
 }
@@ -99,199 +48,175 @@ function propertyCardHTML(p) {
 async function renderPropertiesGrid() {
   const grid = document.getElementById('properties-grid');
   if (!grid) return;
+  document.getElementById('filter-bar')?.remove();
   try {
-    const properties = await fetchProperties();
-    if (!properties.length) {
-      grid.innerHTML = '<p class="text-center">Aucun bien à afficher pour le moment.</p>';
-      return;
-    }
-    grid.innerHTML = properties.map(propertyCardHTML).join('');
-
-    // Pas de sous-titre : seul le titre H1 "Nos biens en gestion" est affiché,
-    // directement suivi des biens proposés.
-    const filterBar = document.getElementById('filter-bar');
-    if (filterBar) {
-      filterBar.remove();
-    }
-  } catch (e) {
+    const { data } = await Passala.api('/properties');
+    grid.innerHTML = data.length
+      ? data.map(propertyCardHTML).join('')
+      : '<p class="text-center">Aucun bien à afficher pour le moment.</p>';
+  } catch (error) {
     grid.innerHTML = '<p class="text-center">Impossible de charger les biens pour le moment. Merci de réessayer plus tard.</p>';
-    console.error(e);
+    console.error(error);
   }
+}
+
+function message(root, title, text) {
+  root.innerHTML = `<div class="container text-center" style="padding:120px 0;"><h2>${esc(title)}</h2>${text ? `<p>${esc(text)}</p>` : ''}<a href="nos-biens.html" class="btn btn-primary">Voir tous nos biens</a></div>`;
 }
 
 async function renderPropertyDetail() {
   const root = document.getElementById('property-detail');
   if (!root) return;
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get('id');
-  if (!id) {
-    root.innerHTML = '<div class="container text-center" style="padding:120px 0;"><h2>Bien introuvable</h2><p>Merci de sélectionner un bien depuis la page « Nos biens ».</p><a href="nos-biens.html" class="btn btn-primary">Voir tous nos biens</a></div>';
-    return;
-  }
+  const id = new URLSearchParams(location.search).get('id');
+  if (!id) return message(root, 'Bien introuvable', 'Merci de sélectionner un bien depuis la page « Nos biens ».');
+  let p;
   try {
-    const p = await fetchProperty(id);
-    if (!p || p.deleted) {
-      root.innerHTML = '<div class="container text-center" style="padding:120px 0;"><h2>Ce bien n\'est plus disponible</h2><a href="nos-biens.html" class="btn btn-primary">Voir tous nos biens</a></div>';
-      return;
-    }
-    document.title = p.name + ' - ' + p.location + ' | Passala Conciergerie';
-
-    const amenities = (p.amenities || []).map(a => `<li><i class="fa-solid ${amenityIcon(a)}"></i> ${a}</li>`).join('');
-
-    root.innerHTML = `
-      <div class="container property-detail-top">
-        <h1 class="property-title">${p.name}</h1>
-
-        ${ratingsHTML(p)}
-
-        ${propertyGalleryHTML(p)}
-
-        <div class="property-layout">
-          <div>
-            <p>${p.description || p.short_description}</p>
-
-            <h3 style="margin-top:36px;margin-bottom:12px;">Équipements &amp; prestations</h3>
-            <ul class="amenity-list" style="margin-bottom:0;">${amenities}</ul>
-          </div>
-
-          <aside>
-            <div class="sticky-card booking-card">
-              ${p.direct_booking ? `
-              <h3>Réserver ce logement</h3>
-              <button type="button" class="btn btn-primary btn-block btn-book-now" onclick="openBookingModal('${p.id}', '${(p.name || '').replace(/'/g, "\\'")}')"><i class="fa-solid fa-calendar-check"></i> Réserver directement</button>
-              <p class="booking-card-note">Réservation directe, sans commission de plateforme</p>
-              ${p.booking_url ? `<a href="${p.booking_url}" target="_blank" rel="noopener" class="btn btn-outline btn-block" style="margin-top:10px;font-size:0.85rem;">${p.booking_label || 'Voir aussi sur Airbnb'} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ''}
-              ${p.booking_url_2 ? `<a href="${p.booking_url_2}" target="_blank" rel="noopener" class="btn btn-outline btn-block" style="margin-top:10px;font-size:0.85rem;">${p.booking_label_2 || 'Voir aussi sur Booking'} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ''}
-              ` : p.booking_url ? `
-              <h3>Réserver ce bien</h3>
-              <p class="price-note">${p.price_note || ''}</p>
-              <a href="${p.booking_url}" target="_blank" rel="noopener" class="btn btn-primary btn-block">${p.booking_label || 'Réserver en ligne'} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-              <p style="font-size:0.88rem;margin-top:18px;">Vous possédez un bien comparable ? Confiez-le nous et bénéficiez du même niveau d'exigence.</p>
-              <a href="contact.html" class="btn btn-outline btn-block">Demander mon étude gratuite</a>
-              ` : `
-              <h3>Intéressé par un bien similaire ?</h3>
-              <p class="price-note">${p.price_note || ''}</p>
-              <p style="font-size:0.92rem;">Vous possédez une maison ou une villa comparable ? Confiez-la nous et bénéficiez du même niveau d'exigence.</p>
-              <a href="contact.html" class="btn btn-primary btn-block">Demander mon étude gratuite</a>
-              <a href="tel:+33744896602" class="btn btn-outline btn-block" style="margin-top:12px;"><i class="fa-solid fa-phone"></i> 07 44 89 66 02</a>
-              `}
-            </div>
-          </aside>
-        </div>
-      </div>
-      <br><br>
-
-      ${p.direct_booking ? bookingModalHTML(p) : ''}
-    `;
-
-    if (p.direct_booking) initBookingModal(p);
-  } catch (e) {
-    root.innerHTML = '<div class="container text-center" style="padding:120px 0;"><h2>Erreur de chargement</h2><p>Merci de réessayer plus tard.</p></div>';
-    console.error(e);
+    p = await Passala.api('/properties/' + encodeURIComponent(id));
+  } catch (error) {
+    return error.status === 404 ? message(root, 'Ce bien n\'est plus disponible') : message(root, 'Erreur de chargement', 'Merci de réessayer plus tard.');
   }
+  document.title = `${p.name}${p.location ? ' - ' + p.location : ''} | Passala Conciergerie`;
+
+  const facts = [
+    `<li><i class="fa-solid fa-user-group"></i> ${esc(p.capacity)} voyageurs</li>`,
+    p.bedrooms !== null ? `<li><i class="fa-solid fa-bed"></i> ${esc(p.bedrooms)} chambre${p.bedrooms > 1 ? 's' : ''}</li>` : '',
+    p.bathrooms !== null ? `<li><i class="fa-solid fa-bath"></i> ${esc(p.bathrooms)} salle${p.bathrooms > 1 ? 's' : ''} de bain</li>` : '',
+    p.surface !== null ? `<li><i class="fa-solid fa-ruler-combined"></i> ${esc(p.surface)} m²</li>` : '',
+    p.location ? `<li><i class="fa-solid fa-location-dot"></i> ${esc(p.location)}</li>` : ''
+  ].join('');
+  const amenities = p.amenities.map(a => `<li><i class="fa-solid ${amenityIcon(a)}"></i> ${esc(a)}</li>`).join('');
+  const description = esc(p.description || p.short_description).replace(/\n+/g, '</p><p>');
+
+  root.innerHTML = `
+    <div class="container property-detail-top">
+      <h1 class="property-title">${esc(p.name)}</h1>
+      ${ratingsHTML(p)}
+      ${galleryHTML(p)}
+      <div class="property-layout">
+        <div>
+          <ul class="amenity-list property-facts">${facts}</ul>
+          <p>${description}</p>
+          ${amenities ? `<h3 style="margin-top:36px;margin-bottom:12px;">Équipements &amp; prestations</h3><ul class="amenity-list" style="margin-bottom:0;">${amenities}</ul>` : ''}
+        </div>
+        <aside><div class="sticky-card booking-card">${bookingCardHTML(p)}</div></aside>
+      </div>
+    </div>
+    <br><br>
+    ${p.direct_booking ? bookingModalHTML(p) : ''}`;
+
+  root.querySelector('.btn-book-now')?.addEventListener('click', openBookingModal);
+  if (p.direct_booking) initBookingModal(p);
+}
+
+function bookingCardHTML(p) {
+  const links = [
+    p.airbnb_url ? `<a href="${safeUrl(p.airbnb_url)}" target="_blank" rel="noopener" class="btn btn-outline btn-block" style="margin-top:10px;font-size:0.85rem;">Voir sur Airbnb <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : '',
+    p.booking_url ? `<a href="${safeUrl(p.booking_url)}" target="_blank" rel="noopener" class="btn btn-outline btn-block" style="margin-top:10px;font-size:0.85rem;">Voir sur Booking.com <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ''
+  ].join('');
+  const price = p.nightly_price !== null
+    ? `<p class="booking-card-price"><strong>${Passala.euros(p.nightly_price)}</strong> / nuit${p.cleaning_fee ? `<br><small>+ ${Passala.euros(p.cleaning_fee)} de ménage</small>` : ''}</p>`
+    : '';
+  if (p.direct_booking) {
+    return `
+      <h3>Réserver ce logement</h3>
+      ${price}
+      <button type="button" class="btn btn-primary btn-block btn-book-now"><i class="fa-solid fa-calendar-check"></i> Demander une réservation</button>
+      <p class="booking-card-note">${esc(p.price_note || 'Réservation directe, sans commission de plateforme')}${p.min_nights > 1 ? ` · ${p.min_nights} nuits minimum` : ''}</p>
+      ${links}`;
+  }
+  return `
+    <h3>${links ? 'Réserver ce bien' : 'Intéressé par ce bien ?'}</h3>
+    ${price}
+    ${p.price_note ? `<p class="price-note">${esc(p.price_note)}</p>` : ''}
+    ${links}
+    <a href="tel:+33744896602" class="btn btn-outline btn-block" style="margin-top:12px;"><i class="fa-solid fa-phone"></i> 07 44 89 66 02</a>`;
 }
 
 function ratingsHTML(p) {
-  const items = [];
-  if (p.rating_airbnb) {
-    items.push(`
-      <div class="rating-chip">
-        <i class="fa-brands fa-airbnb"></i>
-        <span class="rating-platform">Airbnb</span>
-        <span class="rating-value">${p.rating_airbnb}<small>/5</small></span>
-        ${p.rating_airbnb_count ? `<span class="rating-count">(${p.rating_airbnb_count} avis)</span>` : ''}
-      </div>`);
-  }
-  if (p.rating_booking) {
-    items.push(`
-      <div class="rating-chip">
-        <i class="fa-solid fa-star"></i>
-        <span class="rating-platform">Booking.com</span>
-        <span class="rating-value">${p.rating_booking}<small>/10</small></span>
-        ${p.rating_booking_count ? `<span class="rating-count">(${p.rating_booking_count} avis)</span>` : ''}
-      </div>`);
-  }
-  if (!items.length) return '';
-  return `<div class="ratings-row">${items.join('')}</div>`;
+  const chip = (icon, platform, value, max, count) => value === null ? '' : `
+    <div class="rating-chip">
+      <i class="${icon}"></i>
+      <span class="rating-platform">${platform}</span>
+      <span class="rating-value">${esc(value)}<small>/${max}</small></span>
+      ${count ? `<span class="rating-count">(${esc(count)} avis)</span>` : ''}
+    </div>`;
+  const items = chip('fa-brands fa-airbnb', 'Airbnb', p.rating_airbnb, 5, p.rating_airbnb_count) + chip('fa-solid fa-star', 'Booking.com', p.rating_booking, 10, p.rating_booking_count);
+  return items.trim() ? `<div class="ratings-row">${items}</div>` : '';
 }
 
-function propertyGalleryHTML(p) {
-  // Toutes les photos, sans doublon (au cas où image_main serait aussi listée en galerie)
-  const all = [p.image_main, p.image_gallery_1, p.image_gallery_2, p.image_gallery_3, p.image_gallery_4]
-    .filter(Boolean)
-    .filter((src, i, arr) => arr.indexOf(src) === i);
-
-  const count = all.length;
-  const main = all[0];
-  const thumbs = all.slice(1, 5);
-
-  const thumbsHTML = thumbs.map((src, i) => `
-      <a href="${src}" target="_blank" rel="noopener" class="thumb-photo"><img src="${src}" alt="${p.name}, vue ${i + 2}" loading="lazy"></a>`).join('');
-
+function galleryHTML(p) {
+  const photos = p.photos.length ? p.photos : [{ url: PLACEHOLDER, alt: p.name }];
+  const [main, ...rest] = photos;
+  const thumbs = rest.slice(0, 4).map(ph => `<a href="${safeUrl(ph.url)}" target="_blank" rel="noopener" class="thumb-photo"><img src="${safeUrl(ph.url)}" alt="${esc(ph.alt || p.name)}" loading="lazy"></a>`).join('');
   return `
-    <div class="property-gallery count-${Math.min(count, 4) || 1}">
-      <a href="${main}" target="_blank" rel="noopener" class="main-photo"><img src="${main}" alt="${p.name}, vue principale"></a>
-      ${thumbsHTML}
+    <div class="property-gallery count-${Math.min(photos.length, 4)}">
+      <a href="${safeUrl(main.url)}" target="_blank" rel="noopener" class="main-photo"><img src="${safeUrl(main.url)}" alt="${esc(main.alt || p.name)}"></a>
+      ${thumbs}
     </div>`;
 }
 
 function bookingModalHTML(p) {
   return `
-    <div id="booking-modal-overlay" class="booking-modal-overlay">
+    <div id="booking-modal-overlay" class="booking-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
       <div class="booking-modal">
         <button type="button" class="booking-modal-close" id="booking-modal-close" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
-        <span class="eyebrow">Réservation directe</span>
-        <h3 id="booking-modal-title">Réserver ${p.name}</h3>
-        <div id="booking-calendar" style="margin-bottom:22px;"></div>
-        <form id="booking-form">
-          <input type="hidden" id="bk_checkin" name="checkin">
-          <input type="hidden" id="bk_checkout" name="checkout">
+        <span class="eyebrow">Demande de réservation</span>
+        <h3 id="booking-modal-title">Réserver ${esc(p.name)}</h3>
+        <div id="booking-calendar" style="margin-bottom:14px;"></div>
+        <div id="booking-quote" class="booking-quote" hidden></div>
+        <form id="booking-form" novalidate>
           <div class="form-row">
             <div class="field">
               <label for="bk_guests">Voyageurs <span class="req">*</span></label>
-              <input type="number" id="bk_guests" name="guests" min="1" max="${p.capacity || 10}" value="2" required>
+              <input type="number" id="bk_guests" name="guests" min="1" max="${esc(p.capacity)}" value="${Math.min(2, p.capacity)}" required>
             </div>
+            ${p.accepts_pets ? `
             <div class="field" style="display:flex;align-items:flex-end;">
               <div class="checkbox-field" style="margin-bottom:20px;">
                 <input type="checkbox" id="bk_pets" name="pets">
                 <label for="bk_pets">Je voyage avec un animal</label>
               </div>
-            </div>
+            </div>` : ''}
           </div>
           <div class="form-row">
             <div class="field">
               <label for="bk_name">Nom &amp; prénom <span class="req">*</span></label>
-              <input type="text" id="bk_name" name="full_name" required placeholder="Jean Dupont">
+              <input type="text" id="bk_name" name="full_name" required maxlength="120" autocomplete="name" placeholder="Jean Dupont">
             </div>
             <div class="field">
               <label for="bk_phone">Téléphone <span class="req">*</span></label>
-              <input type="tel" id="bk_phone" name="phone" required placeholder="06 12 34 56 78">
+              <input type="tel" id="bk_phone" name="phone" required maxlength="40" autocomplete="tel" placeholder="06 12 34 56 78">
             </div>
           </div>
           <div class="field">
             <label for="bk_email">Adresse email <span class="req">*</span></label>
-            <input type="email" id="bk_email" name="email" required placeholder="vous@exemple.fr">
+            <input type="email" id="bk_email" name="email" required maxlength="254" autocomplete="email" placeholder="vous@exemple.fr">
           </div>
           <div class="field">
             <label for="bk_message">Message (optionnel)</label>
-            <textarea id="bk_message" name="message" placeholder="Heure d'arrivée, questions particulières…"></textarea>
+            <textarea id="bk_message" name="message" maxlength="3000" placeholder="Heure d'arrivée, questions particulières…"></textarea>
+          </div>
+          <input type="text" name="website" tabindex="-1" autocomplete="off" class="hp-field" aria-hidden="true">
+          <div class="checkbox-field">
+            <input type="checkbox" id="bk_consent" name="consent" required>
+            <label for="bk_consent">J'accepte que mes informations soient utilisées pour traiter ma demande de réservation. <span class="req">*</span></label>
           </div>
           <button type="submit" class="btn btn-primary btn-block" id="booking-submit-btn">
-            <i class="fa-solid fa-paper-plane"></i> Envoyer ma demande de réservation
+            <i class="fa-solid fa-paper-plane"></i> Envoyer ma demande
           </button>
-          <div id="booking-form-feedback"></div>
+          <p class="booking-card-note">Votre demande ne vaut pas confirmation : nous vous répondons sous 24 h. Aucun paiement en ligne.</p>
+          <div id="booking-form-feedback" role="status"></div>
         </form>
       </div>
     </div>`;
 }
 
-function openBookingModal(propertyId, propertyName) {
+function openBookingModal() {
   const overlay = document.getElementById('booking-modal-overlay');
   if (!overlay) return;
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
 function closeBookingModal() {
   const overlay = document.getElementById('booking-modal-overlay');
   if (!overlay) return;
@@ -301,90 +226,77 @@ function closeBookingModal() {
 
 async function initBookingModal(p) {
   const overlay = document.getElementById('booking-modal-overlay');
-  const closeBtn = document.getElementById('booking-modal-close');
   const form = document.getElementById('booking-form');
-  if (!overlay || !form) return;
+  const feedback = document.getElementById('booking-form-feedback');
+  const submit = document.getElementById('booking-submit-btn');
+  const quoteBox = document.getElementById('booking-quote');
+  let range = { checkin: null, checkout: null }, identity = null, calendar = null;
 
-  closeBtn.addEventListener('click', closeBookingModal);
-  overlay.addEventListener('click', function (e) {
-    if (e.target === overlay) closeBookingModal();
-  });
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeBookingModal();
-  });
+  document.getElementById('booking-modal-close').addEventListener('click', closeBookingModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeBookingModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBookingModal(); });
 
-  // Calendrier de disponibilité (rouge = indisponible, vert = disponible)
-  const calContainer = document.getElementById('booking-calendar');
-  if (calContainer && typeof createAvailabilityCalendar === 'function') {
+  const show = (type, html) => { feedback.className = type; feedback.innerHTML = html; feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); };
+
+  async function updateQuote() {
+    quoteBox.hidden = true;
+    if (!range.checkin || !range.checkout) return;
+    const nights = Math.round((Date.parse(range.checkout) - Date.parse(range.checkin)) / 86400000);
+    if (nights < p.min_nights) {
+      quoteBox.hidden = false;
+      quoteBox.innerHTML = `<i class="fa-solid fa-circle-info"></i> Ce logement se réserve pour ${p.min_nights} nuits minimum.`;
+      return;
+    }
+    if (p.nightly_price === null) {
+      quoteBox.hidden = false;
+      quoteBox.innerHTML = `${nights} nuit${nights > 1 ? 's' : ''} · tarif communiqué avec notre réponse.`;
+      return;
+    }
+    try {
+      const q = await Passala.api(`/quote?property_id=${encodeURIComponent(p.id)}&checkin=${range.checkin}&checkout=${range.checkout}`);
+      quoteBox.hidden = false;
+      quoteBox.innerHTML = `${q.nights} nuit${q.nights > 1 ? 's' : ''} × ${Passala.euros(q.nightly_price)}${q.cleaning_fee ? ` + ménage ${Passala.euros(q.cleaning_fee)}` : ''} = <strong>${Passala.euros(q.total)}</strong> <small>(estimation)</small>`;
+    } catch { /* le devis est indicatif */ }
+  }
+
+  async function loadCalendar() {
+    const container = document.getElementById('booking-calendar');
     let unavailable = new Set();
-    try { unavailable = await fetchUnavailableDates(p.id); } catch (e) { console.error(e); }
-    createAvailabilityCalendar(calContainer, {
-      propertyId: p.id,
-      selectable: true,
-      monthsToShow: 2,
-      unavailable: unavailable,
-      onRangeChange: function (checkin, checkout) {
-        form.checkin.value = checkin || '';
-        form.checkout.value = checkout || '';
-      }
+    try { unavailable = await fetchUnavailableDates(p.id); } catch (error) { show('error', esc(error.message)); }
+    if (calendar) return calendar.refreshUnavailable(unavailable);
+    calendar = createAvailabilityCalendar(container, {
+      selectable: true, monthsToShow: 2, unavailable,
+      onRangeChange(checkin, checkout) { range = { checkin, checkout }; updateQuote(); }
     });
   }
+  loadCalendar();
 
-  const feedback = document.getElementById('booking-form-feedback');
-  const submitBtn = document.getElementById('booking-submit-btn');
-
-  form.addEventListener('submit', async function (e) {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
-
     const data = {
-      property_id: p.id,
-      property_name: p.name,
-      checkin: form.checkin.value,
-      checkout: form.checkout.value,
-      guests: parseInt(form.guests.value, 10) || 1,
-      pets: form.pets.checked,
-      full_name: form.full_name.value.trim(),
-      email: form.email.value.trim(),
-      phone: form.phone.value.trim(),
-      message: form.message.value.trim(),
-      status: 'Nouvelle'
+      property_id: p.id, checkin: range.checkin, checkout: range.checkout,
+      guests: parseInt(form.guests.value, 10) || 1, pets: Boolean(form.pets?.checked),
+      full_name: form.full_name.value.trim(), email: form.email.value.trim(), phone: form.phone.value.trim(),
+      message: form.message.value.trim(), consent: form.consent.checked, website: form.website.value
     };
+    if (!data.checkin || !data.checkout) return show('error', 'Sélectionnez vos dates d\'arrivée et de départ dans le calendrier.');
+    if (!data.full_name || !data.email || !data.phone) return show('error', 'Merci de remplir tous les champs obligatoires (*).');
+    if (!data.consent) return show('error', 'Merci d\'accepter l\'utilisation de vos informations pour traiter la demande.');
 
-    if (!data.checkin || !data.checkout || !data.full_name || !data.email || !data.phone) {
-      showBookingFeedback('error', 'Merci de remplir tous les champs obligatoires (*).');
-      return;
-    }
-    if (new Date(data.checkout) <= new Date(data.checkin)) {
-      showBookingFeedback('error', 'La date de départ doit être postérieure à la date d\'arrivée.');
-      return;
-    }
-
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Envoi en cours…';
-
+    identity = Passala.requestIdentity(data, identity);
+    submit.disabled = true;
+    submit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Envoi en cours…';
     try {
-      const res = await fetch('tables/booking_requests', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      if (!res.ok) throw new Error('Erreur serveur');
-
-      showBookingFeedback('success', 'Merci ' + data.full_name.split(' ')[0] + ' ! Votre demande de réservation pour « ' + p.name + ' » a bien été enregistrée. Nous vous confirmons votre séjour sous 24h par téléphone ou email.');
+      const result = await Passala.send('/bookings', 'POST', data, { 'Idempotency-Key': identity.key });
+      show('success', `Merci ${esc(data.full_name.split(' ')[0])} ! Votre demande <strong>${esc(result.reference)}</strong> pour « ${esc(p.name)} » du ${esc(Passala.frDate(data.checkin))} au ${esc(Passala.frDate(data.checkout))} a bien été envoyée. Nous revenons vers vous sous 24 h pour la confirmer.`);
       form.reset();
-      form.guests.value = 2;
-    } catch (err) {
-      console.error(err);
-      showBookingFeedback('error', 'Une erreur est survenue lors de l\'envoi. Merci de réessayer, ou de nous appeler directement au 07 44 89 66 02.');
+      identity = null;
+    } catch (error) {
+      show('error', esc(error.message) + (error.status === 409 ? '' : ' Vous pouvez aussi nous appeler au 07 44 89 66 02.'));
+      if (error.status === 409) loadCalendar();
     } finally {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Envoyer ma demande de réservation';
+      submit.disabled = false;
+      submit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Envoyer ma demande';
     }
   });
-
-  function showBookingFeedback(type, text) {
-    feedback.className = type;
-    feedback.innerHTML = text;
-    feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
 }

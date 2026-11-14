@@ -1,19 +1,24 @@
 {
   "$schema": "../node_modules/wrangler/config-schema.json",
-  "name": "passala-reservations",
+  "name": "passala-api",
   "main": "src/index.ts",
+  "account_id": "834ee251038ce2f923cba9847f973c40",
   "compatibility_date": "2026-10-16",
-  "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
-  "observability": { "enabled": true, "head_sampling_rate": 0.1 },
+  "observability": { "enabled": true, "head_sampling_rate": 0.2 },
   "triggers": { "crons": ["*/5 * * * *"] },
   "vars": {
-    "ALLOWED_ORIGINS": "https://passalaconciergerie.com,https://www.passalaconciergerie.com,https://passalaconciergerie.netlify.app"
+    "ALLOWED_ORIGINS": "https://passalaconciergerie.com,https://www.passalaconciergerie.com,https://passalaconciergerie.netlify.app,https://*--passalaconciergerie.netlify.app"
   },
   "d1_databases": [{
     "binding": "DB",
-    "database_name": "passala-reservations",
-    "database_id": "00000000-0000-0000-0000-000000000000",
+    "database_name": "passala-conciergerie",
+    "database_id": "f84ac37b-9819-4476-a540-bad0ced96218",
     "migrations_dir": "migrations"
+  }],
+  "r2_buckets": [{
+    "binding": "PHOTOS",
+    "bucket_name": "passala-photos",
+    "jurisdiction": "eu"
   }]
 }
