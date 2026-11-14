@@ -101,6 +101,7 @@ button.kpi:hover { transform: translateY(-2px); box-shadow: var(--shadow-card); 
 
 /* Formulaires */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+.grid-2 .field-full { grid-column: 1 / -1; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 18px; }
 .admin-main .field { margin-bottom: 16px; }
 .admin-main .field textarea { min-height: 0; }
