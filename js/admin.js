@@ -477,10 +477,11 @@
     const r = await api('/admin/emails');
     const count = state => r.counts.find(c => c.state === state)?.count || 0;
     $('email-status').innerHTML = r.configured
-      ? `<p class="ok"><i class="fa-solid fa-circle-check"></i> Activés : les voyageurs reçoivent un email à la demande et à chaque décision, et vous êtes notifié des nouvelles demandes.</p>
+      ? `<p class="ok"><i class="fa-solid fa-circle-check"></i> Activés : les voyageurs reçoivent un email à la demande et à chaque décision.</p>
+         ${r.notify_configured ? '<p class="ok"><i class="fa-solid fa-circle-check"></i> Vous êtes alerté par email des nouvelles demandes et des nouveaux contacts.</p>' : '<p class="warn"><i class="fa-solid fa-circle-info"></i> Alertes à l\'équipe désactivées : aucune adresse de réception (secret NOTIFY_EMAIL) n\'est configurée. Pensez à consulter cet espace.</p>'}
          <p>${count('sent')} envoyé(s) · ${count('pending') + count('sending')} en file · ${count('failed')} en échec</p>
          ${count('failed') ? '<button type="button" class="btn btn-outline" id="email-retry"><i class="fa-solid fa-rotate"></i> Relancer les envois en échec</button>' : ''}`
-      : '<p class="warn"><i class="fa-solid fa-circle-info"></i> Non activés. Les demandes sont bien enregistrées ici, mais aucun email n\'est envoyé. Pour les activer, ajoutez au Worker Cloudflare les secrets RESEND_API_KEY, EMAIL_FROM et NOTIFY_EMAIL.</p>';
+      : '<p class="warn"><i class="fa-solid fa-circle-info"></i> Non activés. Les demandes sont bien enregistrées ici, mais aucun email n\'est envoyé. Pour les activer, ajoutez au Worker Cloudflare les secrets RESEND_API_KEY et EMAIL_FROM (et NOTIFY_EMAIL pour recevoir les alertes).</p>';
     $('email-retry')?.addEventListener('click', e => run(e.currentTarget, async () => { const x = await send('/admin/emails/retry', 'POST', {}); toast(`${x.requeued} email(s) relancé(s).`); await loadAccount(); }));
   }
   $('password-form').addEventListener('submit', e => {

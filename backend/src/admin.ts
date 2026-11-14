@@ -2,7 +2,7 @@
 import { type Bindings, addDays, bookingReference, fail, int, json, nightsBetween, now, offsetParam, rateLimit, readJson, sha256, slugify, stay, str, today } from './lib';
 import { createSession, requireAdmin, sessionCookie, sessionToken, setPassword, verifyLogin } from './auth';
 import { estimate, loadProperties, loadProperty, propertyFields, view, type PhotoRow } from './properties';
-import { emailReady, sendEmails } from './email';
+import { emailReady, notifyReady, sendEmails } from './email';
 
 const TRANSITIONS: Record<string, string[]> = {
   pending: ['confirmed', 'rejected'],
@@ -267,7 +267,7 @@ export async function adminRoute(request: Request, env: Bindings, ctx: Execution
       env.DB.prepare('SELECT state,COUNT(*) AS count FROM email_outbox GROUP BY state'),
       env.DB.prepare("SELECT id,event,audience,attempts,last_error,created_at FROM email_outbox WHERE state='failed' ORDER BY created_at DESC LIMIT 20")
     ]);
-    return json({ configured: emailReady(env), counts: counts.results, failed: failed.results });
+    return json({ configured: emailReady(env), notify_configured: notifyReady(env), counts: counts.results, failed: failed.results });
   }
   if (method === 'POST' && path === '/api/admin/emails/retry') {
     const result = await env.DB.prepare("UPDATE email_outbox SET state='pending',attempts=0,next_attempt=?,created_at=?,last_error=NULL WHERE state='failed'").bind(now(), now()).run();
