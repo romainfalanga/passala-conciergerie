@@ -24,6 +24,8 @@
   --color-gold-dark: #a3803f;
   --color-turquoise: #6f8f7c;
   --color-turquoise-dark: #4a6b58;
+  --color-azure: #3f7ea6;
+  --color-azure-dark: #2c5c7a;
   --color-pink: #c79aa0;
   --color-white: #ffffff;
   --shadow-soft: 0 20px 50px rgba(14, 31, 55, 0.16);
@@ -152,7 +154,7 @@ section { padding: 90px 0; }
 }
 .logo-banner .banner-icon {
   display: block;
-  height: 42px;
+  height: 26px;
   width: auto;
   object-fit: contain;
   flex-shrink: 0;
@@ -306,6 +308,7 @@ section { padding: 90px 0; }
   }
   .logo-banner { gap: 14px; padding: 10px 46px 10px 14px; }
   .logo-banner .banner-icon { height: 26px; }
+  .logo-banner .banner-icon[src*="olive-branch"] { height: 20px; }
   .logo-banner .banner-text { font-size: 1.3rem; letter-spacing: 0.03em; }
   .logo-banner .banner-dot { margin: 0 8px; }
 
@@ -444,7 +447,7 @@ section { padding: 90px 0; }
 /* ---------- Hero ---------- */
 .hero {
   position: relative;
-  min-height: 92vh;
+  min-height: 62vh;
   display: flex;
   align-items: center;
   color: var(--color-white);
@@ -547,42 +550,41 @@ section { padding: 90px 0; }
 
 /* Variante sans icône pour "Un nettoyage complet, aux standards de l'hôtellerie" (#service) */
 .service-grid {
-  grid-template-columns: repeat(3, 1fr);
-}
-@media (max-width: 900px) {
-  .service-grid { grid-template-columns: 1fr; }
+  grid-template-columns: 1fr;
+  max-width: 720px;
+  margin: 0 auto;
 }
 .service-card {
   position: relative;
-  padding: 22px 22px 20px;
+  padding: 16px 18px 15px;
   border-top: 3px solid var(--color-gold);
   border-radius: var(--radius-lg);
 }
 .service-card h3 {
   font-family: var(--font-serif);
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   color: var(--color-navy);
-  margin-bottom: 4px;
-  padding-bottom: 10px;
+  margin-bottom: 3px;
+  padding-bottom: 8px;
   border-bottom: 1px solid rgba(14,31,55,0.1);
 }
 .service-card .mini-list {
-  margin-top: 16px;
-  gap: 14px;
+  margin-top: 12px;
+  gap: 10px;
 }
 .service-card .mini-list li {
-  font-size: 0.94rem;
-  line-height: 1.45;
+  font-size: 0.86rem;
+  line-height: 1.4;
 }
 .service-card .mini-list li i {
   color: var(--color-gold-dark);
   background: var(--color-cream);
-  width: 24px; height: 24px;
+  width: 21px; height: 21px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   margin-top: 0;
   flex-shrink: 0;
 }
@@ -717,7 +719,8 @@ section { padding: 90px 0; }
 }
 #fonctionnement .process-card h3 { font-size: 0.98rem; margin-bottom: 4px; }
 #fonctionnement .process-card p { font-size: 0.84rem; line-height: 1.35; }
-#reassurance { padding-top: 40px; }
+#reassurance { padding-top: 40px; padding-bottom: 40px; }
+#menage-teaser { padding-top: 40px; }
 
 
 /* ---------- Testimonial / réassurance ---------- */
@@ -730,6 +733,9 @@ section { padding: 90px 0; }
 @media (max-width: 850px) { .reassurance { grid-template-columns: 1fr; } }
 .reassurance img { border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); width: 100%; height: 460px; object-fit: cover; }
 @media (max-width: 850px) { .reassurance img { height: 320px; } }
+.reassurance-reverse > div:first-child { order: 2; }
+.reassurance-reverse > div:last-child { order: 1; }
+@media (max-width: 850px) { .reassurance-reverse > div:first-child, .reassurance-reverse > div:last-child { order: initial; } }
 .quote-block {
   background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-soft) 100%);
   color: var(--color-cream);
@@ -741,14 +747,17 @@ section { padding: 90px 0; }
 .quote-block p { color: var(--color-cream); font-family: var(--font-serif); font-size: 1.25rem; font-style: italic; }
 .quote-block footer { font-size: 0.85rem; color: rgba(201, 169, 98, 0.8); margin-top: 12px; }
 
-/* ---------- Properties grid ---------- */
+/* ---------- Properties grid ----------
+   grid-template-columns en auto-fit + largeur de carte fixe : quand il y a peu
+   de biens (ex. 1 seul actuellement), la/les carte(s) restent centrée(s) sur
+   la ligne au lieu d'être collées à gauche avec un grand vide à droite. */
 .properties-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 360px));
+  justify-content: center;
   gap: 30px;
 }
-@media (max-width: 950px) { .properties-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 620px) { .properties-grid { grid-template-columns: 1fr; } }
+@media (max-width: 620px) { .properties-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; } }
 
 .property-card {
   background: var(--color-white);
@@ -989,8 +998,33 @@ section { padding: 90px 0; }
 .about-portrait .badge span { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink-soft); }
 
 /* Variante texte seul (sans portrait) pour la section fondatrice */
-.about-text-only { max-width: 700px; margin: 0 auto; text-align: center; }
+.about-text-only {
+  max-width: 700px;
+  margin: -150px auto 0;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 56px 60px;
+}
+@media (max-width: 600px) { .about-text-only { margin-top: -90px; padding: 36px 26px; } }
 .about-text-only p { text-align: left; }
+.about-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-gold-dark);
+  margin-bottom: 10px;
+}
+.about-text-only h2 { font-size: 2rem; margin-bottom: 6px; }
+.about-subtitle { color: var(--color-ink-soft); font-size: 1rem; text-align: center !important; margin-bottom: 22px; }
+.about-divider { width: 60px; height: 3px; background: var(--color-gold); margin: 0 auto 28px; border-radius: 2px; }
 .about-badge-inline {
   display: inline-flex;
   align-items: center;
@@ -1071,6 +1105,10 @@ section { padding: 90px 0; }
 .page-hero-content { position: relative; z-index: 2; max-width: 700px; }
 .page-hero h1 { color: var(--color-white); }
 .page-hero p { color: #e4eef2; font-size: 1.1rem; }
+/* Variante : bandeau visuel seul, sans titre/texte (ex. page À propos, où le
+   texte de présentation est repris plus bas, au-dessus de la photo) */
+.page-hero-visual-only { padding: 0; height: 320px; }
+@media (max-width: 600px) { .page-hero-visual-only { height: 220px; } }
 
 /* ---------- CTA bands ---------- */
 .cta-band {
@@ -1105,46 +1143,54 @@ section { padding: 90px 0; }
 .contact-info-card .eyebrow { background: rgba(255,255,255,0.18); color: var(--color-white); }
 .contact-info-card .eyebrow::before { background: var(--color-gold); }
 
-/* ---------- Pressings partenaires — bandeau compact en ligne ---------- */
+/* ---------- Réseau de partenaires — catégories en cartes, une couleur par métier ---------- */
 #pressings { padding-top: 0; padding-bottom: 50px; }
-.pressing-inline {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 18px 24px;
-  background: var(--color-cream);
-  border: 1px solid rgba(201, 169, 98, 0.25);
-  border-radius: var(--radius-lg);
-}
-.pressing-label {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--color-navy);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
 
-/* Badges de catégorie colorés (réseau de partenaires) */
-.category-badge {
-  display: inline-flex;
+.partner-categories {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+}
+@media (max-width: 700px) { .partner-categories { grid-template-columns: 1fr; } }
+
+.partner-category {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  border-top: 4px solid var(--color-gold);
+}
+.partner-category-header {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  min-width: 220px;
-  font-size: 0.85rem;
+  gap: 10px;
+  font-size: 0.95rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 12px 40px;
-  border-radius: 8px;
+  letter-spacing: 0.08em;
   color: var(--color-white);
+  padding: 16px 22px;
 }
-.category-badge-pressing { background: var(--color-turquoise-dark); }
-.category-badge-photo { background: var(--color-lavender-dark); }
-.category-badge-securite { background: var(--color-navy); }
-.category-badge-juridique { background: var(--color-gold-dark); }
+.partner-category-header i { font-size: 1rem; }
+.partner-category-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 20px 22px 22px;
+}
+
+/* Une teinte signature par catégorie de partenaires */
+.partner-category-pressing { border-top-color: var(--color-turquoise-dark); }
+.partner-category-pressing .partner-category-header { background: var(--color-turquoise-dark); }
+.partner-category-piscine { border-top-color: var(--color-azure); }
+.partner-category-piscine .partner-category-header { background: var(--color-azure); }
+.partner-category-photo { border-top-color: var(--color-lavender-dark); }
+.partner-category-photo .partner-category-header { background: var(--color-lavender-dark); }
+.partner-category-securite { border-top-color: var(--color-navy); }
+.partner-category-securite .partner-category-header { background: var(--color-navy); }
+.partner-category-juridique { border-top-color: var(--color-gold-dark); }
+.partner-category-juridique .partner-category-header { background: var(--color-gold-dark); }
+
 .pressing-chip {
   display: inline-flex;
   align-items: center;
@@ -1152,7 +1198,7 @@ section { padding: 90px 0; }
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--color-navy);
-  background: var(--color-white);
+  background: var(--color-cream);
   border: 1px solid rgba(201, 169, 98, 0.4);
   border-radius: 100px;
   padding: 7px 16px;
@@ -1160,7 +1206,6 @@ section { padding: 90px 0; }
 }
 .pressing-chip i { font-size: 0.72rem; }
 .pressing-chip:hover { background: var(--color-navy); color: var(--color-white); border-color: var(--color-navy); }
-@media (max-width: 560px) { .pressing-inline { flex-direction: column; align-items: stretch; text-align: center; } }
 
 /* ---------- Page Nettoyage : listes mini, tarifs détaillés, bandeaux info ---------- */
 .mini-list { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-direction: column; gap: 10px; }
@@ -1176,8 +1221,10 @@ section { padding: 90px 0; }
 .section-tarif .section-head h2 { color: var(--color-navy); }
 .section-tarif .section-head p { color: var(--color-ink-soft); }
 
-.pricing-categories { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-@media (max-width: 1000px) { .pricing-categories { grid-template-columns: repeat(2, 1fr); } }
+/* 4 blocs de tarifs (Ménage, Vitres, Canapés, Matelas) : grille 2x2 équilibrée
+   sur desktop ET tablette (évite le déséquilibre "3 blocs + 1 isolé" d'une
+   grille à 3 colonnes), 1 seule colonne sur mobile. */
+.pricing-categories { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 @media (max-width: 650px) { .pricing-categories { grid-template-columns: 1fr; } }
 .pricing-block { background: var(--color-white); border-radius: var(--radius-lg); padding: 14px 16px; box-shadow: var(--shadow-card); }
 .pricing-block-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid rgba(20,37,52,0.1); }
@@ -1190,9 +1237,68 @@ section { padding: 90px 0; }
 .pricing-row .price { font-family: var(--font-serif); font-weight: 700; color: var(--color-terracotta-dark); white-space: nowrap; }
 .pricing-note-sm { font-size: 0.8rem; font-style: italic; color: var(--color-ink-soft); margin: 12px 0 0; }
 
+/* Lignes de tarifs sélectionnables (simulateur de budget) */
+.pricing-row-selectable { align-items: center; }
+.pricing-check { display: flex; align-items: center; gap: 9px; cursor: pointer; flex: 1; min-width: 0; }
+.pricing-check input[type="checkbox"],
+.pricing-check input[type="radio"] {
+  width: 16px; height: 16px; flex-shrink: 0; accent-color: var(--color-gold-dark); cursor: pointer; margin: 0;
+}
+.pricing-check .label { cursor: pointer; }
+
+.menage-hours-field {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-top: 12px; padding-top: 12px; border-top: 1px dashed rgba(20, 37, 52, 0.12);
+}
+.menage-hours-field label { font-size: 0.85rem; color: var(--color-ink-soft); }
+.menage-hours-field input {
+  width: 70px; padding: 6px 8px; border-radius: 8px; border: 1.5px solid rgba(20,37,52,0.16);
+  font-family: var(--font-sans); font-size: 0.9rem; text-align: center; background: var(--color-cream);
+}
+
+.pricing-ttc-note { text-align: center; font-size: 0.82rem; color: var(--color-ink-soft); font-style: italic; margin: 22px 0 0; }
+
+/* Encadré simulateur de budget */
+.estimator-box {
+  background: var(--color-navy); color: var(--color-white);
+  border-radius: var(--radius-lg); padding: 24px 26px; margin-top: 24px;
+}
+.estimator-box h3 { display: flex; align-items: center; gap: 10px; color: var(--color-white); font-size: 1.15rem; margin-bottom: 6px; }
+.estimator-box h3 i { color: var(--color-gold); }
+.estimator-hint { font-size: 0.88rem; color: rgba(250,246,238,0.75); margin-bottom: 14px; }
+.estimator-list { list-style: none; padding: 0; margin: 0 0 14px; display: flex; flex-direction: column; gap: 6px; }
+.estimator-list li { display: flex; justify-content: space-between; gap: 14px; font-size: 0.9rem; padding: 4px 0; border-bottom: 1px dashed rgba(250,246,238,0.18); }
+.estimator-list li:last-child { border-bottom: none; }
+.estimator-empty { color: rgba(250,246,238,0.6); font-style: italic; }
+.estimator-total {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-family: var(--font-serif); font-size: 1.3rem; font-weight: 700;
+  padding-top: 14px; border-top: 1px solid rgba(250,246,238,0.25); color: var(--color-gold);
+}
+.estimator-note { font-size: 0.78rem; color: rgba(250,246,238,0.6); margin-top: 12px; margin-bottom: 0; }
+
 .pricing-cta-note { text-align: center; margin-top: 40px; font-size: 0.95rem; }
 .pricing-cta-note i { color: var(--color-turquoise-dark); margin-right: 6px; }
 .pricing-cta-note a { color: var(--color-terracotta-dark); font-weight: 600; text-decoration: underline; }
+
+/* Distinction claire Particuliers / Professionnels dans la grille de tarifs */
+.pricing-audience-grid { display: grid; grid-template-columns: 1fr; gap: 34px; }
+.pricing-audience-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 18px; }
+.pricing-audience-header i { font-size: 1.4rem; color: var(--color-gold-dark); margin-top: 4px; flex-shrink: 0; }
+.pricing-audience-header h3 { margin: 0 0 4px; font-family: var(--font-serif); font-size: 1.3rem; color: var(--color-navy); }
+.pricing-audience-header p { margin: 0; font-size: 0.9rem; color: var(--color-ink-soft); }
+
+.pricing-audience-particulier { border-top: 3px solid var(--color-gold); padding-top: 24px; }
+
+.pricing-audience-pro {
+  border-top: 3px solid var(--color-navy);
+  padding-top: 24px;
+  background: rgba(14, 31, 55, 0.04);
+  border-radius: var(--radius-lg);
+  padding: 24px 24px 28px;
+}
+.pricing-pro-note p { font-size: 0.96rem; color: var(--color-ink); margin-bottom: 18px; max-width: 640px; }
+.pricing-pro-note .btn { max-width: 340px; }
 
 .note-banner { display: flex; gap: 14px; align-items: flex-start; background: var(--color-white); border-radius: var(--radius-lg); padding: 18px 22px; box-shadow: var(--shadow-card); margin-top: 40px; }
 @media (max-width: 560px) { .note-banner { flex-direction: column; align-items: flex-start; } }
@@ -1206,11 +1312,3 @@ section { padding: 90px 0; }
 /* Utility */
 .text-center { text-align: center; }
 .mt-0 { margin-top: 0; }
-
-/* Booking forms and server-backed calendar */
-.booking-modal-overlay{z-index:2000}
-.form-honeypot{position:absolute!important;width:1px;height:1px;overflow:hidden;left:-10000px}
-.cal-day:disabled{cursor:not-allowed}
-.cal-day.cal-departure{cursor:pointer;box-shadow:inset 0 0 0 2px #a3803f}
-.cal-day:focus-visible,.cal-nav-btn:focus-visible{outline:3px solid #a3803f;outline-offset:2px}
-.booking-modal [id$="feedback"]{overflow-wrap:anywhere}
