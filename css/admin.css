@@ -27,7 +27,7 @@
 .hint { font-size: 0.86rem; color: var(--color-ink-soft); }
 .empty { color: var(--color-ink-soft); font-size: 0.9rem; margin: 0; }
 
-.admin-card { background: #fff; border: 1px solid #16243a12; border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px; box-shadow: 0 6px 24px #16243a08; }
+.admin-card { scroll-margin-top: 90px; background: #fff; border: 1px solid #16243a12; border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px; box-shadow: 0 6px 24px #16243a08; }
 .login-card { max-width: 440px; margin: 8vh auto; }
 .login-card h1 { margin: 10px 0 22px; }
 .login-error { color: #963f27; font-size: 0.9rem; margin: 14px 0 0; min-height: 1.2em; }
@@ -41,6 +41,7 @@
 .admin-tabs button { display: inline-flex; align-items: center; gap: 8px; padding: 13px 16px; border: 0; border-bottom: 3px solid transparent; background: none; font: inherit; font-size: 0.93rem; color: var(--color-ink-soft); cursor: pointer; white-space: nowrap; }
 .admin-tabs button:hover { color: var(--color-ink); }
 .admin-tabs button.active { border-bottom-color: var(--color-gold); color: var(--color-ink); font-weight: 600; }
+.tab-short { display: none; }
 .tab-badge { min-width: 20px; padding: 1px 7px; border-radius: 99px; background: #c9673f; color: #fff; font-size: 0.72rem; font-weight: 700; text-align: center; }
 
 .admin-head > * { margin: 0; }
@@ -144,7 +145,7 @@ button.kpi:hover { transform: translateY(-2px); box-shadow: var(--shadow-card); 
 .acal-month h4 { text-align: center; font-family: var(--font-serif); text-transform: capitalize; margin: 0 0 8px; }
 .acal-week, .acal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
 .acal-week span { text-align: center; font-size: 0.72rem; color: var(--color-ink-soft); padding-bottom: 4px; }
-.acal-day { position: relative; aspect-ratio: 1; border: 1px solid #16243a14; background: #fff; border-radius: 6px; font: inherit; font-size: 0.82rem; cursor: pointer; padding: 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; color: var(--color-ink); }
+.acal-day { position: relative; aspect-ratio: 1; max-height: 54px; width: 100%; border: 1px solid #16243a14; background: #fff; border-radius: 6px; font: inherit; font-size: 0.82rem; cursor: pointer; padding: 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; color: var(--color-ink); }
 .acal-day small { font-size: 0.58rem; line-height: 1; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .acal-day:hover { border-color: var(--color-gold); }
 .acal-day.booked { background: var(--color-navy); color: #fff; border-color: var(--color-navy); }
@@ -162,7 +163,9 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
 
 @media (max-width: 960px) {
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-  .dash-columns, .acal-months { grid-template-columns: 1fr; }
+  .dash-columns { grid-template-columns: 1fr; }
+  .acal-months { grid-template-columns: repeat(2, 1fr); }
+  .admin-tabs button { padding: 12px 10px; font-size: 0.88rem; gap: 6px; }
   .request-grid { grid-template-columns: 1fr 1fr; }
   .filters { grid-template-columns: 1fr 1fr; }
 }
@@ -170,10 +173,24 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
   .admin-main { padding: 20px 12px 60px; }
   .admin-card { padding: 18px; }
   .grid-2, .grid-3, .filters { grid-template-columns: 1fr; }
+  .acal-months { grid-template-columns: 1fr; }
   .request-top { flex-direction: column; }
   .request-grid { grid-template-columns: 1fr; }
   .note-row { flex-direction: column; }
   .kpi-value { font-size: 1.6rem; }
-  .admin-user span { display: none; }
+  #admin-email, .logout-label { display: none; }
+  .admin-header { position: static; flex-wrap: nowrap; padding: 12px 16px; }
+  .admin-brand { font-size: 1.2rem; }
+  .admin-brand span { display: none; }
+  .admin-user .btn { padding: 8px 12px; }
   .actions .btn-danger { margin-left: 0; }
+}
+@media (max-width: 720px) {
+  .admin-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; overflow: visible; border-bottom: 0; margin-bottom: 22px; }
+  .admin-tabs button { flex-direction: column; justify-content: center; gap: 4px; padding: 10px 4px; border: 1.5px solid #16243a14; border-radius: var(--radius-md); background: #fff; font-size: 0.8rem; white-space: normal; text-align: center; position: relative; }
+  .admin-tabs button i { font-size: 1.05rem; }
+  .admin-tabs button.active { border-color: var(--color-gold); background: var(--color-stone); }
+  .admin-tabs .tab-badge { position: absolute; top: 4px; right: 6px; }
+  .tab-long { display: none; }
+  .tab-short { display: inline; }
 }

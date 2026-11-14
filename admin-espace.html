@@ -18,7 +18,7 @@
   <a href="index.html" class="admin-brand"><img src="images/favicon-key.png" alt=""> Passala <span>Espace admin</span></a>
   <div class="admin-user" id="admin-user" hidden>
     <span id="admin-email"></span>
-    <button type="button" class="btn btn-outline" id="logout"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</button>
+    <button type="button" class="btn btn-outline" id="logout" aria-label="Déconnexion"><i class="fa-solid fa-right-from-bracket"></i> <span class="logout-label">Déconnexion</span></button>
   </div>
 </header>
 
@@ -39,7 +39,7 @@
 <!-- ───── Application ───── -->
 <main id="app-view" class="admin-main" hidden>
   <nav class="admin-tabs" role="tablist">
-    <button type="button" data-tab="dashboard" class="active"><i class="fa-solid fa-chart-line"></i> Tableau de bord</button>
+    <button type="button" data-tab="dashboard" class="active"><i class="fa-solid fa-chart-line"></i> <span class="tab-long">Tableau de bord</span><span class="tab-short">Accueil</span></button>
     <button type="button" data-tab="bookings"><i class="fa-solid fa-calendar-check"></i> Réservations <span class="tab-badge" id="badge-pending" hidden></span></button>
     <button type="button" data-tab="calendar"><i class="fa-solid fa-calendar-days"></i> Calendrier</button>
     <button type="button" data-tab="properties"><i class="fa-solid fa-house"></i> Biens</button>
@@ -155,7 +155,7 @@
       </div>
       <div class="field"><label>Description courte (cartes de la page « Nos biens »)</label><textarea name="short_description" maxlength="300" rows="2"></textarea></div>
       <div class="field"><label>Description complète</label><textarea name="description" maxlength="6000" rows="7"></textarea></div>
-      <div class="field"><label>Équipements (un par ligne)</label><textarea name="amenities" rows="5" placeholder="Wifi&#10;Climatisation&#10;Parking privé"></textarea></div>
+      <div class="field"><label>Équipements (un par ligne)</label><textarea name="amenities" rows="7" placeholder="Wifi&#10;Climatisation&#10;Parking privé"></textarea></div>
       <h3>Tarifs</h3>
       <div class="grid-3">
         <div class="field"><label>Prix par nuit (€)</label><input type="number" name="nightly_price" min="0" step="0.01" placeholder="Non affiché"></div>
