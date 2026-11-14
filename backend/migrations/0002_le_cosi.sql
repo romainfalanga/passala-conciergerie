@@ -8,7 +8,7 @@ VALUES (
   2,1,1,
   '["Wifi","Télévision","Cuisine équipée","Parking intérieur privé","Balcon","Animaux acceptés"]',
   1,1,1,
-  'Réservation directe, réponse sous 24h',
+  '',
   'https://www.airbnb.fr/rooms/1195368552455371664',
   'https://www.booking.com/hotel/fr/le-cosi-six-fours-les-plages.fr.html'
 );
