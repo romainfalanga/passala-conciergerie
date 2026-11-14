@@ -6,5 +6,5 @@ if (origin.protocol !== 'https:' || origin.username || origin.password || origin
 await rm('dist', { recursive: true, force: true }); await mkdir('dist');
 for (const file of await readdir('.')) if (file.endsWith('.html')) await cp(file, 'dist/' + file);
 for (const dir of ['css', 'js', 'images']) await cp(dir, 'dist/' + dir, { recursive: true });
-await writeFile('dist/_redirects', `/api/* ${origin.origin}/api/:splat 200!\n`);
+await writeFile('dist/_redirects', `/api/* ${origin.origin}/api/:splat 200!\n/admin /admin-espace.html 200\n`);
 console.log('Site construit. Seuls les fichiers publics sont publiés.');

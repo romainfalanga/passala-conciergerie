@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
       form.reset();
       identity = null;
     } catch (error) {
-      show('error', `${Passala.escape(error.message)} Vous pouvez aussi nous écrire à <a href="mailto:contact@passala-conciergerie.fr">contact@passala-conciergerie.fr</a> ou appeler le 07 44 89 66 02.`);
+      show('error', `${Passala.escape(error.message)} Vous pouvez aussi nous écrire à <a href="mailto:passalaconciergerie@gmail.com">passalaconciergerie@gmail.com</a> ou appeler le 07 44 89 66 02.`);
     } finally {
       submit.disabled = false;
       submit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Envoyer ma demande';

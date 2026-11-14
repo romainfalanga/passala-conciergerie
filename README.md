@@ -24,7 +24,7 @@ Navigateur ──► passalaconciergerie.com (Netlify : domaine + pages statique
 | `nos-biens.html` | Grille des biens **publiés** (`GET /api/properties`) |
 | `bien.html?id=…` | Fiche d'un bien, calendrier de disponibilité, estimation du prix et **demande de réservation** |
 | `contact.html` | Formulaire propriétaire (enregistré comme « contact » dans l'admin) |
-| `admin-espace.html` | **Espace admin** (non référencé, accès par identifiant + mot de passe) |
+| `admin-espace.html` | **Espace admin**, accessible aussi via `/admin` (non référencé, accès par identifiant + mot de passe) |
 
 ## Fonctionnement des réservations
 
@@ -70,7 +70,7 @@ Schéma complet : `backend/migrations/0001_schema.sql`. Les montants sont stock�
 
 ## Emails automatiques (optionnels)
 
-Avec [Resend](https://resend.com), ajoutez au Worker trois secrets : `RESEND_API_KEY`, `EMAIL_FROM` (adresse d'un domaine vérifié) et `NOTIFY_EMAIL` (adresse qui reçoit les alertes). Vous pouvez aussi les définir dans les secrets GitHub Actions du dépôt.
+Configuré sur le domaine `passalaconciergerie.com` (vérifié dans Resend). Pour une autre configuration, ajoutez au Worker trois secrets : `RESEND_API_KEY`, `EMAIL_FROM` (adresse d'un domaine vérifié) et `NOTIFY_EMAIL` (adresse qui reçoit les alertes). Vous pouvez aussi les définir dans les secrets GitHub Actions du dépôt.
 
 - **Voyageur** : accusé de réception de la demande, puis confirmation, refus ou annulation (uniquement pour les demandes faites sur le site).
 - **Admin** : alerte à chaque nouvelle demande de réservation et à chaque nouveau contact propriétaire.
