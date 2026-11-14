@@ -86,6 +86,7 @@ npm run check   # TypeScript
 npm test        # tests de l'API (Miniflare : D1 et R2 locaux)
 ```
 
-- **API** : à chaque push sur `main` qui touche `backend/` ou `scripts/`, le workflow `.github/workflows/cloudflare.yml` lance les tests, applique les migrations D1 et déploie le Worker. Le secret `CLOUDFLARE_API_TOKEN` doit avoir les droits Workers Scripts, D1 et R2 (édition) sur le compte.
+- **Tests** : le workflow `.github/workflows/cloudflare.yml` lance la vérification TypeScript et les tests à chaque pull request et à chaque push sur `main`.
+- **API** : `npm run deploy:api` applique les migrations D1 et déploie le Worker. Pour un déploiement automatique depuis GitHub, créez la variable de dépôt `CLOUDFLARE_AUTODEPLOY=true` et un secret `CLOUDFLARE_API_TOKEN` valable sur le compte de `backend/wrangler.jsonc`, avec les droits Workers Scripts, D1 et R2 en édition.
 - **Site** : Netlify construit avec `npm run build`. La variable `PASSALA_API_ORIGIN` (dans `netlify.toml`) pointe vers le Worker.
 - **Nouvelle migration** : ajoutez `backend/migrations/0003_….sql`. Elle sera appliquée au prochain déploiement.
