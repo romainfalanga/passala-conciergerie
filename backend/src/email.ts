@@ -3,7 +3,9 @@ import { type Bindings, euros, now } from './lib';
 
 type Outbox = { id: string; audience: string; event: string; payload: string; attempts: number };
 
-export const emailReady = (env: Bindings) => Boolean(env.RESEND_API_KEY && env.EMAIL_FROM && env.NOTIFY_EMAIL);
+export const emailReady = (env: Bindings) => Boolean(env.RESEND_API_KEY && env.EMAIL_FROM);
+/** Les alertes à l'équipe exigent en plus une adresse de réception. */
+export const notifyReady = (env: Bindings) => Boolean(emailReady(env) && env.NOTIFY_EMAIL);
 
 const frDate = (value: unknown) => {
   const [y, m, d] = String(value).split('-').map(Number);
@@ -46,12 +48,17 @@ export async function sendEmails(env: Bindings) {
       const row = await env.DB.prepare("UPDATE email_outbox SET state='sending',lease_until=?,attempts=attempts+1 WHERE id=(SELECT id FROM email_outbox WHERE state IN ('pending','sending') AND next_attempt<=? AND lease_until<? ORDER BY created_at,id LIMIT 1) RETURNING *")
         .bind(lease, now(), now()).first<Outbox>();
       if (!row) break;
+      if (row.audience === 'admin' && !env.NOTIFY_EMAIL) {
+        // Pas d'adresse d'alerte configurée : on n'envoie pas, sans compter d'échec.
+        await env.DB.prepare("UPDATE email_outbox SET state='sent',sent_at=?,lease_until=0,last_error='no_recipient' WHERE id=? AND lease_until=?").bind(now(), row.id, lease).run();
+        continue;
+      }
       try {
         const message = content(row, env);
         const response = await fetch('https://api.resend.com/emails', {
           method: 'POST', signal: AbortSignal.timeout(15000),
           headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json', 'Idempotency-Key': `passala/${row.id}` },
-          body: JSON.stringify({ from: env.EMAIL_FROM, to: [message.to], subject: message.subject, text: message.text, reply_to: env.NOTIFY_EMAIL })
+          body: JSON.stringify({ from: env.EMAIL_FROM, to: [message.to], subject: message.subject, text: message.text, ...(env.NOTIFY_EMAIL ? { reply_to: env.NOTIFY_EMAIL } : {}) })
         });
         await response.body?.cancel();
         if (!response.ok) throw new Error(`resend_${response.status}`);
