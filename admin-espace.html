@@ -3,561 +3,223 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Espace propriétaire - Passala Conciergerie</title>
+<title>Espace admin - Passala Conciergerie</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/admin.css">
 <link rel="icon" type="image/png" href="images/favicon-key.png">
-<link rel="apple-touch-icon" href="images/favicon-key.png">
-<style>
-  #admin-page { padding: 60px 0 100px; }
-  #admin-page .container { max-width: 760px; }
-  .admin-intro { background: var(--color-white); border-radius: var(--radius-lg); padding: 26px 30px; box-shadow: var(--shadow-card); margin-bottom: 30px; }
-  .admin-intro p { margin-bottom: 8px; font-size: 0.94rem; }
-  .admin-select { margin-bottom: 30px; }
-  .admin-select select {
-    width: 100%; padding: 13px 16px; border-radius: var(--radius-md);
-    border: 1.5px solid rgba(20,37,52,0.16); font-family: var(--font-sans);
-    font-size: 0.98rem; background: var(--color-cream); color: var(--color-ink);
-  }
-  .admin-note { font-size: 0.85rem; color: var(--color-ink-soft); text-align: center; margin-top: 18px; }
-  #admin-feedback, #ratings-feedback { margin-top: 16px; padding: 12px 16px; border-radius: var(--radius-md); font-size: 0.9rem; display: none; }
-  #admin-feedback.success, #ratings-feedback.success { display: block; background: #e0f2e8; color: #1b6b45; }
-  #admin-feedback.error, #ratings-feedback.error { display: block; background: #f8e3dd; color: #963f27; }
-  #admin-feedback.info, #ratings-feedback.info { display: block; background: rgba(201,169,98,0.15); color: var(--color-gold-dark); }
-  .ratings-form-card { background: var(--color-white); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-card); }
-  .ratings-block { border-top: 1px solid rgba(20,37,52,0.08); padding-top: 20px; margin-top: 20px; }
-  .ratings-block:first-child { border-top: none; padding-top: 0; margin-top: 0; }
-  .ratings-block h3 { font-size: 1.05rem; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-  .ratings-block h3 i { color: var(--color-gold-dark); }
-  .admin-section-title { font-size: 1.3rem; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
-  .admin-section-title i { color: var(--color-gold-dark); }
-  .admin-block { margin-bottom: 50px; }
-  .admin-block:last-child { margin-bottom: 0; }
-  .property-form-card { background: var(--color-white); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-card); }
-  .property-form-card .field { margin-bottom: 16px; }
-  .property-form-card label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
-  .property-form-card input, .property-form-card textarea, .property-form-card select {
-    width: 100%; padding: 11px 14px; border-radius: var(--radius-md);
-    border: 1.5px solid rgba(20,37,52,0.16); font-family: var(--font-sans);
-    font-size: 0.94rem; background: var(--color-cream); color: var(--color-ink);
-  }
-  .property-form-card textarea { min-height: 90px; resize: vertical; }
-  .property-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
-  @media (max-width: 600px) { .property-form-grid { grid-template-columns: 1fr; } }
-  .property-form-grid .field-full { grid-column: 1 / -1; }
-  .checkbox-field-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-  .checkbox-field-row input { width: auto; }
-  .form-section-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-ink-soft); margin: 22px 0 10px; font-weight: 700; }
-  .form-section-label:first-child { margin-top: 0; }
-  .property-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
-  .property-actions .btn { flex: 1; min-width: 180px; }
-  .btn-danger { background: #963f27; color: #fff; border: none; }
-  .btn-danger:hover { background: #7a3220; }
-  .login-gate { max-width: 420px; margin: 100px auto; background: var(--color-white); border-radius: var(--radius-lg); padding: 36px 32px; box-shadow: var(--shadow-soft); text-align: center; }
-  .login-gate h1 { font-size: 1.4rem; margin-bottom: 10px; }
-  .login-gate p { font-size: 0.9rem; color: var(--color-ink-soft); margin-bottom: 20px; }
-  .login-gate input { width: 100%; padding: 13px 16px; border-radius: var(--radius-md); border: 1.5px solid rgba(20,37,52,0.16); font-family: var(--font-sans); font-size: 1rem; margin-bottom: 14px; text-align: center; letter-spacing: 0.1em; }
-  .login-gate .error-msg { color: #963f27; font-size: 0.88rem; margin-top: 10px; display: none; }
-  #admin-page.locked #admin-content { display: none; }
-</style>
 </head>
-<body>
+<body class="admin-body">
 
-<header id="site-header">
-  <div class="logo-banner">
-    <img src="images/icon-olive-branch-v6.png" alt="" class="banner-icon">
-    <span class="banner-text">Passala Conciergerie</span>
-    <img src="images/icon-lavender-branch-v6.png" alt="" class="banner-icon">
+<header class="admin-header">
+  <a href="index.html" class="admin-brand"><img src="images/favicon-key.png" alt=""> Passala <span>Espace admin</span></a>
+  <div class="admin-user" id="admin-user" hidden>
+    <span id="admin-email"></span>
+    <button type="button" class="btn btn-outline" id="logout"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</button>
   </div>
 </header>
 
-<div id="login-gate" class="login-gate">
-  <h1><i class="fa-solid fa-lock"></i> Espace propriétaire</h1>
-  <p>Cette page est réservée au propriétaire. Merci de saisir le mot de passe pour accéder à la gestion des biens.</p>
-  <input type="password" id="admin-password-input" placeholder="Mot de passe" autocomplete="current-password">
-  <button type="button" class="btn btn-primary btn-block" id="admin-login-btn"><i class="fa-solid fa-right-to-bracket"></i> Accéder à mon espace</button>
-  <p class="error-msg" id="admin-login-error">Mot de passe incorrect. Merci de réessayer.</p>
-</div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-<main id="admin-page" class="locked">
-  <div class="container" id="admin-content">
-    <div class="admin-intro">
-      <span class="eyebrow">Espace propriétaire</span>
-      <h1 style="font-size:1.8rem;">Gestion de vos biens</h1>
-      <p>Choisissez un bien ci-dessous : vous pourrez ensuite gérer sa fiche complète, son calendrier de disponibilité et ses notes Airbnb / Booking depuis cette même page.</p>
-      <p style="color:var(--color-terracotta-dark);font-weight:600;">⚠️ Cette page n'est pas listée dans le menu du site, ne partagez son lien qu'en interne.</p>
-    </div>
-
-    <div class="admin-select">
-      <label for="admin-property-select" style="display:block;font-weight:600;margin-bottom:8px;">Bien à gérer</label>
-      <select id="admin-property-select"></select>
-    </div>
-
-    <!-- FICHE DU BIEN -->
-    <section class="admin-block">
-      <h2 class="admin-section-title"><i class="fa-solid fa-house"></i> Fiche du bien</h2>
-      <p style="margin-bottom:18px;font-size:0.94rem;">Modifiez ici le nom, la description, la capacité, les équipements et les liens de réservation du bien sélectionné. Les changements sont visibles immédiatement sur le site (dans l'aperçu Genspark ; sur une publication Netlify séparée, voir la note en bas de page).</p>
-      <div class="property-form-card">
-        <form id="property-form">
-          <div class="form-section-label">Informations générales</div>
-          <div class="property-form-grid">
-            <div class="field"><label for="pf_name">Nom du bien</label><input type="text" id="pf_name" name="name" required></div>
-            <div class="field"><label for="pf_type">Type</label>
-              <select id="pf_type" name="type">
-                <option>Villa</option><option>Mas</option><option>Bastide</option>
-                <option>Appartement</option><option>Maison</option><option>Studio</option>
-              </select>
-            </div>
-            <div class="field field-full"><label for="pf_location">Ville / secteur</label><input type="text" id="pf_location" name="location"></div>
-            <div class="field"><label for="pf_capacity">Capacité (pers.)</label><input type="number" id="pf_capacity" name="capacity" min="1"></div>
-            <div class="field"><label for="pf_bedrooms">Chambres</label><input type="number" id="pf_bedrooms" name="bedrooms" min="0"></div>
-            <div class="field"><label for="pf_bathrooms">Salles de bain</label><input type="number" id="pf_bathrooms" name="bathrooms" min="0"></div>
-            <div class="field"><label for="pf_surface">Surface (m²)</label><input type="number" id="pf_surface" name="surface" min="0"></div>
-          </div>
-
-          <div class="form-section-label">Descriptions</div>
-          <div class="field"><label for="pf_short_description">Description courte (pour les cartes)</label><textarea id="pf_short_description" name="short_description" style="min-height:60px;"></textarea></div>
-          <div class="field"><label for="pf_description">Description complète</label><textarea id="pf_description" name="description"></textarea></div>
-          <div class="field"><label for="pf_amenities">Équipements (séparés par des virgules)</label><textarea id="pf_amenities" name="amenities" style="min-height:60px;" placeholder="Wifi, Télévision, Parking privé..."></textarea></div>
-
-          <div class="form-section-label">Photos (URLs)</div>
-          <div class="property-form-grid">
-            <div class="field field-full"><label for="pf_image_main">Image principale</label><input type="text" id="pf_image_main" name="image_main" placeholder="images/mon-bien.jpg"></div>
-            <div class="field"><label for="pf_image_gallery_1">Galerie 1</label><input type="text" id="pf_image_gallery_1" name="image_gallery_1"></div>
-            <div class="field"><label for="pf_image_gallery_2">Galerie 2</label><input type="text" id="pf_image_gallery_2" name="image_gallery_2"></div>
-            <div class="field"><label for="pf_image_gallery_3">Galerie 3</label><input type="text" id="pf_image_gallery_3" name="image_gallery_3"></div>
-            <div class="field"><label for="pf_image_gallery_4">Galerie 4</label><input type="text" id="pf_image_gallery_4" name="image_gallery_4"></div>
-          </div>
-
-          <div class="form-section-label">Réservation</div>
-          <div class="checkbox-field-row">
-            <input type="checkbox" id="pf_direct_booking" name="direct_booking">
-            <label for="pf_direct_booking" style="margin-bottom:0;">Activer la réservation directe sur le site</label>
-          </div>
-          <div class="checkbox-field-row">
-            <input type="checkbox" id="pf_accepts_pets" name="accepts_pets">
-            <label for="pf_accepts_pets" style="margin-bottom:0;">Animaux acceptés</label>
-          </div>
-          <div class="field"><label for="pf_price_note">Indication tarifaire / statut</label><input type="text" id="pf_price_note" name="price_note"></div>
-          <div class="property-form-grid">
-            <div class="field"><label for="pf_booking_url">Lien Airbnb (ou autre, optionnel)</label><input type="text" id="pf_booking_url" name="booking_url"></div>
-            <div class="field"><label for="pf_booking_label">Libellé du lien</label><input type="text" id="pf_booking_label" name="booking_label" placeholder="Réserver sur Airbnb"></div>
-            <div class="field"><label for="pf_booking_url_2">Lien Booking.com (optionnel)</label><input type="text" id="pf_booking_url_2" name="booking_url_2"></div>
-            <div class="field"><label for="pf_booking_label_2">Libellé du 2e lien</label><input type="text" id="pf_booking_label_2" name="booking_label_2" placeholder="Réserver sur Booking"></div>
-          </div>
-
-          <div class="property-actions">
-            <button type="submit" class="btn btn-primary" id="property-save-btn"><i class="fa-solid fa-floppy-disk"></i> Enregistrer les modifications</button>
-            <button type="button" class="btn btn-outline" id="property-new-btn"><i class="fa-solid fa-plus"></i> Ajouter un nouveau bien</button>
-          </div>
-          <div id="property-feedback"></div>
-        </form>
-      </div>
-      <p class="admin-note">Astuce : pour les photos, uploadez d'abord l'image dans le projet (dossier <code>images/</code>) puis indiquez son chemin ici (ex. <code>images/ma-villa.jpg</code>).</p>
-    </section>
-
-    <!-- DISPONIBILITÉS -->
-    <section class="admin-block">
-      <h2 class="admin-section-title"><i class="fa-solid fa-calendar-days"></i> Calendrier de disponibilité</h2>
-      <p style="margin-bottom:18px;font-size:0.94rem;">Cliquez sur une date <strong style="color:#1b6b45;">verte</strong> pour la rendre <strong>indisponible</strong> (elle passera en rouge), ou sur une date <strong style="color:#963f27;">rouge</strong> pour la <strong>libérer</strong> à nouveau. Les changements sont enregistrés instantanément.</p>
-      <div id="admin-calendar"></div>
-      <div id="admin-feedback"></div>
-      <p class="admin-note">Astuce : vous pouvez aussi bloquer une période entière en cliquant jour par jour.</p>
-    </section>
-
-    <!-- NOTES AIRBNB / BOOKING -->
-    <section class="admin-block">
-      <h2 class="admin-section-title"><i class="fa-solid fa-star"></i> Notes Airbnb &amp; Booking</h2>
-      <p style="margin-bottom:18px;font-size:0.94rem;">Mettez ici à jour manuellement la note et le nombre d'avis, tels qu'affichés sur Airbnb et Booking.com. Ces informations s'affichent ensuite automatiquement sur la fiche du bien.</p>
-      <div class="ratings-form-card">
-        <form id="ratings-form">
-          <div class="ratings-block">
-            <h3><i class="fa-brands fa-airbnb"></i> Airbnb</h3>
-            <div class="form-row">
-              <div class="field">
-                <label for="rating_airbnb">Note (sur 5)</label>
-                <input type="number" id="rating_airbnb" name="rating_airbnb" min="0" max="5" step="0.01" placeholder="Ex : 4.9">
-              </div>
-              <div class="field">
-                <label for="rating_airbnb_count">Nombre d'avis</label>
-                <input type="number" id="rating_airbnb_count" name="rating_airbnb_count" min="0" step="1" placeholder="Ex : 32">
-              </div>
-            </div>
-          </div>
-
-          <div class="ratings-block">
-            <h3><i class="fa-solid fa-star"></i> Booking.com</h3>
-            <div class="form-row">
-              <div class="field">
-                <label for="rating_booking">Note (sur 10)</label>
-                <input type="number" id="rating_booking" name="rating_booking" min="0" max="10" step="0.1" placeholder="Ex : 9.2">
-              </div>
-              <div class="field">
-                <label for="rating_booking_count">Nombre d'avis</label>
-                <input type="number" id="rating_booking_count" name="rating_booking_count" min="0" step="1" placeholder="Ex : 18">
-              </div>
-            </div>
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-block" id="ratings-submit-btn" style="margin-top:10px;">
-            <i class="fa-solid fa-floppy-disk"></i> Enregistrer les notes
-          </button>
-          <div id="ratings-feedback"></div>
-        </form>
-      </div>
-      <p class="admin-note">Astuce : laissez un champ vide si la note n'existe pas encore ou ne doit pas s'afficher sur le site.</p>
-    </section>
-
-    <p class="admin-note" style="margin-top:40px;">⚠️ Cette protection par mot de passe fonctionne dans l'aperçu Genspark. Si le site est publié tel quel sur un hébergeur externe (ex. Netlify via GitHub), n'importe qui connaissant l'URL de cette page peut voir ce code JavaScript : ce n'est donc pas une sécurité fiable sur cet hébergement, seulement une protection "basique" contre le hasard. Demandez-moi la Hosted Deploy de Genspark si vous voulez une vraie protection appliquée côté serveur.</p>
-  </div>
+<!-- ───── Connexion ───── -->
+<main id="login-view" class="admin-main" hidden>
+  <form id="login-form" class="admin-card login-card">
+    <span class="eyebrow">Accès réservé</span>
+    <h1>Connexion</h1>
+    <div class="field"><label for="login-email">Email</label><input type="email" id="login-email" autocomplete="username" required></div>
+    <div class="field"><label for="login-password">Mot de passe</label><input type="password" id="login-password" autocomplete="current-password" required></div>
+    <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-right-to-bracket"></i> Se connecter</button>
+    <p class="login-error" id="login-error" role="alert"></p>
+  </form>
 </main>
 
-<footer id="site-footer">
-  <div class="container">
-    <div class="footer-bottom" style="border-top:none;padding-top:0;">
-      <span>© 2026 Passala Conciergerie – Espace de gestion interne – SIRET 917 539 371 00026</span>
+<!-- ───── Application ───── -->
+<main id="app-view" class="admin-main" hidden>
+  <nav class="admin-tabs" role="tablist">
+    <button type="button" data-tab="dashboard" class="active"><i class="fa-solid fa-chart-line"></i> Tableau de bord</button>
+    <button type="button" data-tab="bookings"><i class="fa-solid fa-calendar-check"></i> Réservations <span class="tab-badge" id="badge-pending" hidden></span></button>
+    <button type="button" data-tab="calendar"><i class="fa-solid fa-calendar-days"></i> Calendrier</button>
+    <button type="button" data-tab="properties"><i class="fa-solid fa-house"></i> Biens</button>
+    <button type="button" data-tab="leads"><i class="fa-solid fa-envelope-open-text"></i> Contacts <span class="tab-badge" id="badge-leads" hidden></span></button>
+    <button type="button" data-tab="account"><i class="fa-solid fa-gear"></i> Réglages</button>
+  </nav>
+
+  <!-- Tableau de bord -->
+  <section data-panel="dashboard">
+    <div id="dash-alerts"></div>
+    <div class="kpi-grid">
+      <button type="button" class="kpi" data-goto="bookings"><span class="kpi-label">Demandes à traiter</span><span class="kpi-value" id="kpi-pending">–</span></button>
+      <div class="kpi"><span class="kpi-label">Occupation ce mois</span><span class="kpi-value" id="kpi-occupancy">–</span></div>
+      <div class="kpi"><span class="kpi-label">Montant confirmé ce mois</span><span class="kpi-value" id="kpi-revenue">–</span><span class="kpi-sub" id="kpi-revenue-sub"></span></div>
+      <button type="button" class="kpi" data-goto="leads"><span class="kpi-label">Nouveaux contacts</span><span class="kpi-value" id="kpi-leads">–</span></button>
     </div>
-  </div>
-</footer>
+    <div class="dash-columns">
+      <div class="admin-card"><h2><i class="fa-solid fa-house-user"></i> En ce moment</h2><div id="dash-inhouse"></div></div>
+      <div class="admin-card"><h2><i class="fa-solid fa-plane-arrival"></i> Arrivées (30 jours)</h2><div id="dash-arrivals"></div></div>
+      <div class="admin-card"><h2><i class="fa-solid fa-plane-departure"></i> Départs (14 jours)</h2><div id="dash-departures"></div></div>
+    </div>
+  </section>
 
-<script src="js/availability-calendar.js"></script>
-<script>
-// Protection d'accès basique côté client (code en dur, changez-le ici si besoin).
-// ⚠️ Ceci n'est PAS une sécurité serveur : sur un hébergement statique externe
-// (ex. Netlify), le mot de passe est visible dans le code source de la page.
-// Pour une vraie protection appliquée côté serveur, utilisez la Hosted Deploy
-// de Genspark avec une règle d'accès "authenticated" sur cette page.
-const ADMIN_PASSWORD = 'Passala2026';
-const ADMIN_SESSION_KEY = 'passala_admin_unlocked';
+  <!-- Réservations -->
+  <section data-panel="bookings" hidden>
+    <div class="admin-head">
+      <h1>Réservations</h1>
+      <button type="button" class="btn btn-primary" id="manual-open"><i class="fa-solid fa-plus"></i> Ajouter une réservation</button>
+    </div>
+    <form id="manual-form" class="admin-card" hidden>
+      <h2>Réservation reçue ailleurs (Airbnb, Booking, téléphone…)</h2>
+      <p class="hint">Elle est enregistrée comme confirmée et bloque immédiatement les dates. Aucun email n'est envoyé au voyageur.</p>
+      <div class="grid-2">
+        <div class="field"><label for="mb-property">Bien</label><select id="mb-property" name="property_id" class="property-select" required></select></div>
+        <div class="field"><label for="mb-source">Origine</label><select id="mb-source" name="source"><option value="airbnb">Airbnb</option><option value="booking">Booking.com</option><option value="telephone">Téléphone / direct</option><option value="autre">Autre</option></select></div>
+        <div class="field"><label for="mb-checkin">Arrivée</label><input type="date" id="mb-checkin" name="checkin" required></div>
+        <div class="field"><label for="mb-checkout">Départ</label><input type="date" id="mb-checkout" name="checkout" required></div>
+        <div class="field"><label for="mb-name">Nom du voyageur</label><input type="text" id="mb-name" name="full_name" maxlength="120" required></div>
+        <div class="field"><label for="mb-guests">Voyageurs</label><input type="number" id="mb-guests" name="guests" min="1" max="30" value="2" required></div>
+        <div class="field"><label for="mb-email">Email (optionnel)</label><input type="email" id="mb-email" name="email" maxlength="254"></div>
+        <div class="field"><label for="mb-phone">Téléphone (optionnel)</label><input type="tel" id="mb-phone" name="phone" maxlength="40"></div>
+        <div class="field"><label for="mb-total">Montant en € (optionnel)</label><input type="number" id="mb-total" name="estimated_total" min="0" step="0.01"></div>
+        <div class="field"><label for="mb-note">Note interne</label><input type="text" id="mb-note" name="admin_note" maxlength="2000"></div>
+      </div>
+      <div class="actions"><button type="submit" class="btn btn-primary">Enregistrer</button><button type="button" class="btn btn-outline" id="manual-cancel">Annuler</button></div>
+    </form>
+    <form class="filters" id="booking-filters">
+      <select name="status" aria-label="Statut">
+        <option value="pending">À traiter</option>
+        <option value="confirmed">Confirmées</option>
+        <option value="">Toutes</option>
+        <option value="rejected">Refusées</option>
+        <option value="cancelled">Annulées</option>
+      </select>
+      <select name="property_id" class="property-select" data-all="Tous les biens" aria-label="Bien"></select>
+      <select name="period" aria-label="Période">
+        <option value="upcoming">À venir et en cours</option>
+        <option value="past">Passées</option>
+        <option value="">Toutes les dates</option>
+      </select>
+      <input type="search" name="q" placeholder="Nom, email, référence…" aria-label="Rechercher">
+    </form>
+    <div id="booking-list"></div>
+    <button type="button" class="btn btn-outline btn-block" id="booking-more" hidden>Afficher plus</button>
+  </section>
 
-(function initGate() {
-  const gate = document.getElementById('login-gate');
-  const page = document.getElementById('admin-page');
-  const input = document.getElementById('admin-password-input');
-  const btn = document.getElementById('admin-login-btn');
-  const errorMsg = document.getElementById('admin-login-error');
+  <!-- Calendrier -->
+  <section data-panel="calendar" hidden>
+    <div class="admin-head">
+      <h1>Calendrier</h1>
+      <select id="cal-property" class="property-select" aria-label="Bien"></select>
+    </div>
+    <div class="admin-card">
+      <div class="cal-toolbar">
+        <button type="button" class="cal-nav-btn" id="acal-prev" aria-label="Mois précédents"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="cal-legend">
+          <span><i class="dot dot-free"></i> Libre</span>
+          <span><i class="dot dot-booked"></i> Réservé</span>
+          <span><i class="dot dot-blocked"></i> Bloqué</span>
+          <span><i class="dot dot-pending"></i> Demande en attente</span>
+        </div>
+        <button type="button" class="cal-nav-btn" id="acal-next" aria-label="Mois suivants"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+      <div id="admin-calendar" class="acal-months"></div>
+      <div id="cal-selection" class="cal-selection">Cliquez sur un premier jour puis sur un dernier jour pour sélectionner des nuits à bloquer ou libérer. Cliquez sur une nuit réservée pour voir la réservation.</div>
+    </div>
+  </section>
 
-  function unlock() {
-    gate.style.display = 'none';
-    page.classList.remove('locked');
-    sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
-  }
+  <!-- Biens -->
+  <section data-panel="properties" hidden>
+    <div class="admin-head">
+      <h1>Biens</h1>
+      <button type="button" class="btn btn-primary" id="property-new"><i class="fa-solid fa-plus"></i> Nouveau bien</button>
+    </div>
+    <div id="property-list" class="property-admin-list"></div>
+    <form id="property-form" class="admin-card" hidden>
+      <div class="admin-head"><h2 id="pf-title">Fiche du bien</h2><a id="pf-view" class="btn btn-outline" target="_blank" rel="noopener"><i class="fa-solid fa-eye"></i> Voir sur le site</a></div>
+      <div class="switch-row">
+        <label class="switch"><input type="checkbox" name="published"><span></span> Publié sur le site</label>
+        <label class="switch"><input type="checkbox" name="direct_booking"><span></span> Demandes de réservation sur le site</label>
+        <label class="switch"><input type="checkbox" name="accepts_pets"><span></span> Animaux acceptés</label>
+      </div>
+      <h3>Informations</h3>
+      <div class="grid-2">
+        <div class="field"><label>Nom du bien</label><input type="text" name="name" maxlength="120" required></div>
+        <div class="field"><label>Type</label><select name="type"><option>Studio</option><option>Appartement</option><option>Maison</option><option>Villa</option><option>Mas</option><option>Bastide</option></select></div>
+        <div class="field"><label>Ville / secteur</label><input type="text" name="location" maxlength="120"></div>
+        <div class="field"><label>Ordre d'affichage</label><input type="number" name="sort_order" min="-1000" max="1000" step="1"></div>
+        <div class="field"><label>Capacité (voyageurs)</label><input type="number" name="capacity" min="1" max="30" required></div>
+        <div class="field"><label>Chambres</label><input type="number" name="bedrooms" min="0" max="30"></div>
+        <div class="field"><label>Salles de bain</label><input type="number" name="bathrooms" min="0" max="30"></div>
+        <div class="field"><label>Surface (m²)</label><input type="number" name="surface" min="1" max="10000"></div>
+      </div>
+      <div class="field"><label>Description courte (cartes de la page « Nos biens »)</label><textarea name="short_description" maxlength="300" rows="2"></textarea></div>
+      <div class="field"><label>Description complète</label><textarea name="description" maxlength="6000" rows="7"></textarea></div>
+      <div class="field"><label>Équipements (un par ligne)</label><textarea name="amenities" rows="5" placeholder="Wifi&#10;Climatisation&#10;Parking privé"></textarea></div>
+      <h3>Tarifs</h3>
+      <div class="grid-3">
+        <div class="field"><label>Prix par nuit (€)</label><input type="number" name="nightly_price" min="0" step="0.01" placeholder="Non affiché"></div>
+        <div class="field"><label>Frais de ménage (€)</label><input type="number" name="cleaning_fee" min="0" step="0.01"></div>
+        <div class="field"><label>Nuits minimum</label><input type="number" name="min_nights" min="1" max="90"></div>
+      </div>
+      <div class="field"><label>Mention tarifaire (optionnelle)</label><input type="text" name="price_note" maxlength="200" placeholder="Réservation directe, réponse sous 24h"></div>
+      <h3>Plateformes &amp; notes</h3>
+      <div class="grid-2">
+        <div class="field"><label>Lien Airbnb</label><input type="url" name="airbnb_url" maxlength="500" placeholder="https://"></div>
+        <div class="field"><label>Lien Booking.com</label><input type="url" name="booking_url" maxlength="500" placeholder="https://"></div>
+        <div class="field"><label>Note Airbnb (/5)</label><input type="number" name="rating_airbnb" min="0" max="5" step="0.01"></div>
+        <div class="field"><label>Nombre d'avis Airbnb</label><input type="number" name="rating_airbnb_count" min="0" step="1"></div>
+        <div class="field"><label>Note Booking (/10)</label><input type="number" name="rating_booking" min="0" max="10" step="0.1"></div>
+        <div class="field"><label>Nombre d'avis Booking</label><input type="number" name="rating_booking_count" min="0" step="1"></div>
+      </div>
+      <div id="photo-section">
+        <h3>Photos <small>(la première est la photo principale)</small></h3>
+        <div id="photo-grid" class="photo-grid"></div>
+        <label class="btn btn-outline photo-upload"><i class="fa-solid fa-cloud-arrow-up"></i> Ajouter des photos<input type="file" id="photo-input" accept="image/jpeg,image/png,image/webp" multiple hidden></label>
+        <p class="hint">JPEG, PNG ou WebP, 10 Mo maximum par photo. Les photos sont réduites automatiquement avant l'envoi.</p>
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Enregistrer</button>
+        <button type="button" class="btn btn-outline" id="property-close">Fermer</button>
+        <button type="button" class="btn btn-danger" id="property-delete"><i class="fa-solid fa-trash"></i> Supprimer</button>
+      </div>
+    </form>
+  </section>
 
-  function tryLogin() {
-    if (input.value === ADMIN_PASSWORD) {
-      errorMsg.style.display = 'none';
-      unlock();
-    } else {
-      errorMsg.style.display = 'block';
-    }
-  }
+  <!-- Contacts -->
+  <section data-panel="leads" hidden>
+    <div class="admin-head">
+      <h1>Contacts propriétaires</h1>
+      <select id="lead-status" aria-label="Statut">
+        <option value="new">Nouveaux</option>
+        <option value="contacted">Contactés</option>
+        <option value="closed">Clôturés</option>
+        <option value="">Tous</option>
+      </select>
+    </div>
+    <div id="lead-list"></div>
+    <button type="button" class="btn btn-outline btn-block" id="lead-more" hidden>Afficher plus</button>
+  </section>
 
-  if (sessionStorage.getItem(ADMIN_SESSION_KEY) === '1') {
-    unlock();
-  }
+  <!-- Réglages -->
+  <section data-panel="account" hidden>
+    <h1>Réglages</h1>
+    <div class="admin-card">
+      <h2><i class="fa-solid fa-envelope"></i> Emails automatiques</h2>
+      <div id="email-status"></div>
+    </div>
+    <form id="password-form" class="admin-card">
+      <h2><i class="fa-solid fa-key"></i> Changer le mot de passe</h2>
+      <div class="grid-2">
+        <div class="field"><label for="pw-current">Mot de passe actuel</label><input type="password" id="pw-current" autocomplete="current-password" required></div>
+        <div class="field"><label for="pw-new">Nouveau mot de passe (12 caractères minimum)</label><input type="password" id="pw-new" autocomplete="new-password" minlength="12" required></div>
+      </div>
+      <button type="submit" class="btn btn-primary">Changer le mot de passe</button>
+    </form>
+  </section>
+</main>
 
-  btn.addEventListener('click', tryLogin);
-  input.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') tryLogin();
-  });
-})();
-
-document.addEventListener('DOMContentLoaded', async function () {
-  const select = document.getElementById('admin-property-select');
-  const calContainer = document.getElementById('admin-calendar');
-  const calFeedback = document.getElementById('admin-feedback');
-  const ratingsForm = document.getElementById('ratings-form');
-  const ratingsFeedback = document.getElementById('ratings-feedback');
-  const ratingsSubmitBtn = document.getElementById('ratings-submit-btn');
-  const propertyForm = document.getElementById('property-form');
-  const propertyFeedback = document.getElementById('property-feedback');
-  const propertySaveBtn = document.getElementById('property-save-btn');
-  const propertyNewBtn = document.getElementById('property-new-btn');
-  let properties = [];
-
-  function showCalFeedback(type, text) {
-    calFeedback.className = type;
-    calFeedback.innerHTML = text;
-  }
-
-  function showRatingsFeedback(type, text) {
-    ratingsFeedback.className = type;
-    ratingsFeedback.innerHTML = text;
-  }
-
-  async function loadProperties() {
-    const res = await fetch('tables/properties?limit=100');
-    const json = await res.json();
-    properties = (json.data || []).filter(function (p) { return !p.deleted; });
-    if (!properties.length) {
-      select.innerHTML = '<option>Aucun bien disponible</option>';
-      return;
-    }
-    select.innerHTML = properties.map(function (p) {
-      return '<option value="' + p.id + '">' + p.name + ' - ' + p.location + '</option>';
-    }).join('');
-  }
-
-  function currentProperty() {
-    var id = select.value;
-    for (var i = 0; i < properties.length; i++) {
-      if (properties[i].id === id) return properties[i];
-    }
-    return null;
-  }
-
-  function fillRatingsForm(p) {
-    ratingsForm.rating_airbnb.value = (p.rating_airbnb !== undefined && p.rating_airbnb !== null) ? p.rating_airbnb : '';
-    ratingsForm.rating_airbnb_count.value = (p.rating_airbnb_count !== undefined && p.rating_airbnb_count !== null) ? p.rating_airbnb_count : '';
-    ratingsForm.rating_booking.value = (p.rating_booking !== undefined && p.rating_booking !== null) ? p.rating_booking : '';
-    ratingsForm.rating_booking_count.value = (p.rating_booking_count !== undefined && p.rating_booking_count !== null) ? p.rating_booking_count : '';
-  }
-
-  function val(v) { return (v === undefined || v === null) ? '' : v; }
-
-  function fillPropertyForm(p) {
-    propertyForm.name.value = val(p.name);
-    propertyForm.type.value = val(p.type) || 'Villa';
-    propertyForm.location.value = val(p.location);
-    propertyForm.capacity.value = val(p.capacity);
-    propertyForm.bedrooms.value = val(p.bedrooms);
-    propertyForm.bathrooms.value = val(p.bathrooms);
-    propertyForm.surface.value = val(p.surface);
-    propertyForm.short_description.value = val(p.short_description);
-    propertyForm.description.value = val(p.description);
-    propertyForm.amenities.value = Array.isArray(p.amenities) ? p.amenities.join(', ') : '';
-    propertyForm.image_main.value = val(p.image_main);
-    propertyForm.image_gallery_1.value = val(p.image_gallery_1);
-    propertyForm.image_gallery_2.value = val(p.image_gallery_2);
-    propertyForm.image_gallery_3.value = val(p.image_gallery_3);
-    propertyForm.image_gallery_4.value = val(p.image_gallery_4);
-    propertyForm.direct_booking.checked = !!p.direct_booking;
-    propertyForm.accepts_pets.checked = !!p.accepts_pets;
-    propertyForm.price_note.value = val(p.price_note);
-    propertyForm.booking_url.value = val(p.booking_url);
-    propertyForm.booking_label.value = val(p.booking_label);
-    propertyForm.booking_url_2.value = val(p.booking_url_2);
-    propertyForm.booking_label_2.value = val(p.booking_label_2);
-    propertyForm.dataset.mode = 'edit';
-    propertyForm.dataset.editId = p.id;
-    propertySaveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Enregistrer les modifications';
-  }
-
-  function resetPropertyFormForCreate() {
-    propertyForm.reset();
-    propertyForm.type.value = 'Villa';
-    propertyForm.dataset.mode = 'create';
-    delete propertyForm.dataset.editId;
-    propertySaveBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Créer ce nouveau bien';
-    propertyFeedback.className = '';
-    propertyFeedback.innerHTML = '';
-  }
-
-  function slugify(str) {
-    return (str || '')
-      .toString()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '') || ('bien-' + Date.now());
-  }
-
-  async function loadCalendarFor(propertyId) {
-    const unavailable = await fetchUnavailableDates(propertyId);
-    createAvailabilityCalendar(calContainer, {
-      propertyId: propertyId,
-      selectable: false,
-      monthsToShow: 2,
-      unavailable: unavailable,
-      onDayClick: async function (dateKeyStr, isCurrentlyUnavailable) {
-        await toggleDate(propertyId, dateKeyStr, isCurrentlyUnavailable);
-      }
-    });
-    calContainer.classList.add('cal-admin-wrapper');
-    const widget = calContainer.querySelector('.cal-widget');
-    if (widget) widget.classList.add('cal-admin');
-  }
-
-  async function toggleDate(propertyId, dateKeyStr, isCurrentlyUnavailable) {
-    showCalFeedback('info', 'Mise à jour en cours…');
-    try {
-      if (isCurrentlyUnavailable) {
-        const res = await fetch('tables/availability?limit=1000');
-        const json = await res.json();
-        const row = (json.data || []).find(function (r) { return !r.deleted && r.property_id === propertyId && r.date === dateKeyStr && r.status === 'Indisponible'; });
-        if (row) {
-          await fetch('tables/availability/' + encodeURIComponent(row.id), { method: 'DELETE' });
-        }
-        showCalFeedback('success', 'Le ' + dateKeyStr.split('-').reverse().join('/') + ' est de nouveau disponible.');
-      } else {
-        await fetch('tables/availability', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ property_id: propertyId, date: dateKeyStr, status: 'Indisponible' })
-        });
-        showCalFeedback('success', 'Le ' + dateKeyStr.split('-').reverse().join('/') + ' est maintenant marqué indisponible.');
-      }
-      await loadCalendarFor(propertyId);
-    } catch (e) {
-      console.error(e);
-      showCalFeedback('error', 'Une erreur est survenue. Merci de réessayer.');
-    }
-  }
-
-  async function selectProperty(propertyId) {
-    const p = currentProperty();
-    calFeedback.className = '';
-    calFeedback.innerHTML = '';
-    ratingsFeedback.className = '';
-    ratingsFeedback.innerHTML = '';
-    await loadCalendarFor(propertyId);
-    if (p) {
-      fillRatingsForm(p);
-      fillPropertyForm(p);
-    }
-  }
-
-  await loadProperties();
-  if (properties.length) {
-    await selectProperty(properties[0].id);
-    select.addEventListener('change', function () {
-      selectProperty(select.value);
-    });
-  } else {
-    resetPropertyFormForCreate();
-  }
-
-  propertyNewBtn.addEventListener('click', function () {
-    resetPropertyFormForCreate();
-    propertyFeedback.className = 'info';
-    propertyFeedback.innerHTML = 'Remplissez le formulaire puis cliquez sur « Créer ce nouveau bien ». Pensez à uploader vos photos dans le dossier images/ au préalable.';
-    propertyFeedback.style.display = 'block';
-  });
-
-  function readPropertyFormData() {
-    const amenitiesRaw = propertyForm.amenities.value || '';
-    const amenities = amenitiesRaw.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
-    return {
-      name: propertyForm.name.value.trim(),
-      type: propertyForm.type.value,
-      location: propertyForm.location.value.trim(),
-      capacity: propertyForm.capacity.value === '' ? null : parseInt(propertyForm.capacity.value, 10),
-      bedrooms: propertyForm.bedrooms.value === '' ? null : parseInt(propertyForm.bedrooms.value, 10),
-      bathrooms: propertyForm.bathrooms.value === '' ? null : parseInt(propertyForm.bathrooms.value, 10),
-      surface: propertyForm.surface.value === '' ? null : parseInt(propertyForm.surface.value, 10),
-      short_description: propertyForm.short_description.value.trim(),
-      description: propertyForm.description.value.trim(),
-      amenities: amenities,
-      image_main: propertyForm.image_main.value.trim(),
-      image_gallery_1: propertyForm.image_gallery_1.value.trim(),
-      image_gallery_2: propertyForm.image_gallery_2.value.trim(),
-      image_gallery_3: propertyForm.image_gallery_3.value.trim(),
-      image_gallery_4: propertyForm.image_gallery_4.value.trim(),
-      direct_booking: propertyForm.direct_booking.checked,
-      accepts_pets: propertyForm.accepts_pets.checked,
-      price_note: propertyForm.price_note.value.trim(),
-      booking_url: propertyForm.booking_url.value.trim(),
-      booking_label: propertyForm.booking_label.value.trim(),
-      booking_url_2: propertyForm.booking_url_2.value.trim(),
-      booking_label_2: propertyForm.booking_label_2.value.trim()
-    };
-  }
-
-  propertyForm.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const data = readPropertyFormData();
-    if (!data.name) {
-      propertyFeedback.className = 'error';
-      propertyFeedback.innerHTML = 'Le nom du bien est obligatoire.';
-      return;
-    }
-
-    const isCreate = propertyForm.dataset.mode === 'create';
-    propertySaveBtn.disabled = true;
-    const originalLabel = propertySaveBtn.innerHTML;
-    propertySaveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enregistrement…';
-    propertyFeedback.className = 'info';
-    propertyFeedback.innerHTML = 'Enregistrement en cours…';
-
-    try {
-      if (isCreate) {
-        data.id = slugify(data.name);
-        data.featured = false;
-        const res = await fetch('tables/properties', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error('Erreur serveur');
-        const created = await res.json();
-        properties.push(created);
-        select.innerHTML += '<option value="' + created.id + '">' + created.name + ' - ' + created.location + '</option>';
-        select.value = created.id;
-        await selectProperty(created.id);
-        propertyFeedback.className = 'success';
-        propertyFeedback.innerHTML = 'Le bien « ' + created.name + ' » a bien été créé et apparaît maintenant sur la page « Nos biens ».';
-      } else {
-        const id = propertyForm.dataset.editId;
-        const res = await fetch('tables/properties/' + encodeURIComponent(id), {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error('Erreur serveur');
-        const p = currentProperty();
-        if (p) Object.assign(p, data);
-        const opt = select.querySelector('option[value="' + id + '"]');
-        if (opt) opt.textContent = data.name + ' - ' + data.location;
-        propertyFeedback.className = 'success';
-        propertyFeedback.innerHTML = 'La fiche de « ' + data.name + ' » a bien été mise à jour.';
-      }
-    } catch (err) {
-      console.error(err);
-      propertyFeedback.className = 'error';
-      propertyFeedback.innerHTML = 'Une erreur est survenue. Merci de réessayer.';
-    } finally {
-      propertySaveBtn.disabled = false;
-      propertySaveBtn.innerHTML = originalLabel;
-    }
-  });
-
-  ratingsForm.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    var p = currentProperty();
-    if (!p) return;
-
-    var data = {
-      rating_airbnb: ratingsForm.rating_airbnb.value === '' ? null : parseFloat(ratingsForm.rating_airbnb.value),
-      rating_airbnb_count: ratingsForm.rating_airbnb_count.value === '' ? null : parseInt(ratingsForm.rating_airbnb_count.value, 10),
-      rating_booking: ratingsForm.rating_booking.value === '' ? null : parseFloat(ratingsForm.rating_booking.value),
-      rating_booking_count: ratingsForm.rating_booking_count.value === '' ? null : parseInt(ratingsForm.rating_booking_count.value, 10)
-    };
-
-    ratingsSubmitBtn.disabled = true;
-    ratingsSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enregistrement…';
-    showRatingsFeedback('info', 'Enregistrement en cours…');
-
-    try {
-      var res = await fetch('tables/properties/' + encodeURIComponent(p.id), {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      if (!res.ok) throw new Error('Erreur serveur');
-      Object.assign(p, data);
-      showRatingsFeedback('success', 'Les notes de « ' + p.name + ' » ont bien été mises à jour.');
-    } catch (err) {
-      console.error(err);
-      showRatingsFeedback('error', 'Une erreur est survenue. Merci de réessayer.');
-    } finally {
-      ratingsSubmitBtn.disabled = false;
-      ratingsSubmitBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Enregistrer les notes';
-    }
-  });
-});
-</script>
+<script src="js/api.js"></script>
+<script src="js/admin.js"></script>
 </body>
 </html>

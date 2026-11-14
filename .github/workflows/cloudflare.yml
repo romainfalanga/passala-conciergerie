@@ -1,7 +1,7 @@
-name: Cloudflare reservations
+name: API Cloudflare
 on:
   push:
-    branches: [main, cloudflare-reservations]
+    branches: [main]
     paths:
       - 'backend/**'
       - 'scripts/**'
@@ -30,14 +30,12 @@ jobs:
         run: npm run types
       - name: Type check
         run: npm run check
-      - name: Reservation integrity tests
+      - name: Tests de l'API
         run: npm test
-      - name: Deploy D1 and Worker
+      - name: Migrations D1 et déploiement du Worker
         run: npm run deploy:api
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           EMAIL_FROM: ${{ secrets.EMAIL_FROM || vars.EMAIL_FROM }}
           NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL || vars.NOTIFY_EMAIL }}

@@ -1,7 +1,6 @@
-// Passala Conciergerie — Calendrier de disponibilité (client + admin)
-// Rouge = indisponible (table "availability"), Vert = disponible.
-// L'admin gère les indisponibilités via admin-calendrier.html ; ce fichier
-// lit la table "availability" pour construire un calendrier visuel.
+// Passala Conciergerie — Calendrier de disponibilité (côté voyageur)
+// Rouge = nuit occupée (réservation confirmée ou date bloquée), vert = disponible.
+// Les données viennent de l'API (/api/availability), alimentée depuis l'espace admin.
 
 const MONTH_NAMES_FR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 const DAY_NAMES_FR = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
@@ -11,15 +10,8 @@ function dateKey(y, m, d) { return `${y}-${pad2(m + 1)}-${pad2(d)}`; }
 function todayKey() { const t = new Date(); return dateKey(t.getFullYear(), t.getMonth(), t.getDate()); }
 
 async function fetchUnavailableDates(propertyId) {
-  const res = await fetch('tables/availability?limit=1000');
-  const json = await res.json();
-  const set = new Set();
-  (json.data || []).forEach(row => {
-    if (!row.deleted && row.property_id === propertyId && row.status === 'Indisponible' && row.date) {
-      set.add(row.date);
-    }
-  });
-  return set;
+  const result = await Passala.api('/availability?property_id=' + encodeURIComponent(propertyId));
+  return new Set(result.dates || []);
 }
 
 /**
@@ -66,7 +58,8 @@ function createAvailabilityCalendar(container, opts) {
     const lo = startKey <= endKey ? startKey : endKey;
     const hi = startKey <= endKey ? endKey : startKey;
     for (const d of options.unavailable) {
-      if (d > lo && d < hi) return true;
+      // Les nuits de l'arrivée à la veille du départ doivent être libres.
+      if (d >= lo && d < hi) return true;
     }
     return false;
   }
@@ -96,7 +89,9 @@ function createAvailabilityCalendar(container, opts) {
       if (isStart) cls += ' cal-range-start';
       if (isEnd) cls += ' cal-range-end';
 
-      const disabledAttr = (past || (unavail && options.selectable)) ? 'data-disabled="1"' : '';
+      // Une nuit occupée peut quand même servir de jour de départ.
+      const canCheckout = options.selectable && rangeStart && !rangeEnd && key > rangeStart && !hasUnavailableBetween(rangeStart, key);
+      const disabledAttr = (past || (unavail && options.selectable && !canCheckout)) ? 'data-disabled="1"' : '';
       cells += `<button type="button" class="${cls}" data-date="${key}" ${disabledAttr}>${d}</button>`;
     }
 
