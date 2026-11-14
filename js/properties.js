@@ -121,7 +121,7 @@ function bookingCardHTML(p) {
       <h3>Réserver ce logement</h3>
       ${price}
       <button type="button" class="btn btn-primary btn-block btn-book-now"><i class="fa-solid fa-calendar-check"></i> Demander une réservation</button>
-      <p class="booking-card-note">${esc(p.price_note || 'Réservation directe, sans commission de plateforme')}${p.min_nights > 1 ? ` · ${p.min_nights} nuits minimum` : ''}</p>
+      ${[p.price_note, p.min_nights > 1 ? `${p.min_nights} nuits minimum` : ''].filter(Boolean).length ? `<p class="booking-card-note">${esc([p.price_note, p.min_nights > 1 ? `${p.min_nights} nuits minimum` : ''].filter(Boolean).join(' · '))}</p>` : ''}
       ${links}`;
   }
   return `

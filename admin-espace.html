@@ -146,8 +146,7 @@
       <div class="grid-2">
         <div class="field"><label>Nom du bien</label><input type="text" name="name" maxlength="120" required></div>
         <div class="field"><label>Type</label><select name="type"><option>Studio</option><option>Appartement</option><option>Maison</option><option>Villa</option><option>Mas</option><option>Bastide</option></select></div>
-        <div class="field"><label>Ville / secteur</label><input type="text" name="location" maxlength="120"></div>
-        <div class="field"><label>Ordre d'affichage</label><input type="number" name="sort_order" min="-1000" max="1000" step="1"></div>
+        <div class="field field-full"><label>Ville / secteur</label><input type="text" name="location" maxlength="120"></div>
         <div class="field"><label>Capacité (voyageurs)</label><input type="number" name="capacity" min="1" max="30" required></div>
         <div class="field"><label>Chambres</label><input type="number" name="bedrooms" min="0" max="30"></div>
         <div class="field"><label>Salles de bain</label><input type="number" name="bathrooms" min="0" max="30"></div>
@@ -162,7 +161,7 @@
         <div class="field"><label>Frais de ménage (€)</label><input type="number" name="cleaning_fee" min="0" step="0.01"></div>
         <div class="field"><label>Nuits minimum</label><input type="number" name="min_nights" min="1" max="90"></div>
       </div>
-      <div class="field"><label>Mention tarifaire (optionnelle)</label><input type="text" name="price_note" maxlength="200" placeholder="Réservation directe, réponse sous 24h"></div>
+      <div class="field"><label>Mention tarifaire (optionnelle)</label><input type="text" name="price_note" maxlength="200" placeholder="Ex. : Tarifs dégressifs à la semaine"></div>
       <h3>Plateformes &amp; notes</h3>
       <div class="grid-2">
         <div class="field"><label>Lien Airbnb</label><input type="url" name="airbnb_url" maxlength="500" placeholder="https://"></div>

@@ -319,7 +319,7 @@
     if (p) $('pf-view').href = 'bien.html?id=' + encodeURIComponent(p.id);
     $('property-delete').hidden = !p;
     $('photo-section').hidden = !p;
-    const values = p || { type: 'Appartement', capacity: 2, min_nights: 1, cleaning_fee: 0, sort_order: 0, amenities: [] };
+    const values = p || { type: 'Appartement', capacity: 2, min_nights: 1, cleaning_fee: 0, amenities: [] };
     for (const el of f.elements) {
       if (!el.name || !(el.name in values) && el.type !== 'checkbox') continue;
       const v = values[el.name];
@@ -336,7 +336,7 @@
   function propertyPayload(f) {
     const v = name => f.elements[name].value.trim();
     return {
-      name: v('name'), type: v('type'), location: v('location'), sort_order: Number(v('sort_order') || 0),
+      name: v('name'), type: v('type'), location: v('location'),
       capacity: Number(v('capacity')), bedrooms: intOrNull(v('bedrooms')), bathrooms: intOrNull(v('bathrooms')), surface: intOrNull(v('surface')),
       short_description: v('short_description'), description: v('description'),
       amenities: v('amenities').split('\n').map(s => s.trim()).filter(Boolean),
